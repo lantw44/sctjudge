@@ -1,0 +1,26 @@
+
+編譯需求
+  Bourne Shell (sh)
+  Make 程式 (make)
+  C 編譯器 (cc)
+  C 標準函式庫 (libc)
+  POSIX Thread 函式庫 (libpthread)
+ 若啟用 Linux capability 支援，還需要一個函式庫：
+  Linux Capability 函式庫 (libcap)
+
+安裝
+  ./configure 
+  make
+  make install
+
+移除
+  make uninstall
+
+=============================================================================
+
+以下列出 configure 而可用的選項（也可用 ./configure --help 查到）
+  --enable-debug       停用 -O2 選項並加上 -g (但如果你有指定 CFLAGS 就沒效了)
+  --enable-static      靜態連結可執行檔
+  --enable-procmon     使用 Linux 下 /proc 提供的資訊監控程序
+  --enable-cap         使用 Linux capability 支援（而不使用 setuid）
+

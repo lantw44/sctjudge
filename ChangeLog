@@ -1,0 +1,41 @@
+
+2012-07-28  藍挺瑋  <lantw44@gmail.com> - 0.91
+
+	* 軟體建置
+	修改 src/Makefile.am 因不正確的值而導致連結失敗的問題
+
+	* 額外檔案
+	這是第一個有 ChangeLog 檔案的版本，其他資訊請參考 README
+
+2012-07-21  藍挺瑋  <lantw44@gmail.com> - 0.9
+
+	* 軟體建置
+	使用 GNU Autotool 取代原先人工編寫的 Makefile
+
+	* 程式
+	將大多數檢查參數的工作由 sctjudge_makechild 移至 main 函式中
+
+	* 程式
+	改善原先受測程式超過時間限制無法立即偵測的問題
+
+	* 程式
+	若使用 verbose 模式，結束後會顯示使用的 CPU 時間
+
+	* 程式
+	使用 nanosleep 取代所有 usleep
+
+2012-07-19  藍挺瑋  <lantw44@gmail.com> - 0.8
+
+	* 程式
+	修正上一版本許多程序、檔案權限控制問題
+	
+	* 擴充功能
+	正式啟用 Linux 程序監視器
+
+2012-07-18  藍挺瑋  <lantw44@gmail.com> - 0.7
+
+	* 軟體建置
+	使用單純的 Makefile 進行管理
+
+	* 程式
+	此為第一個測試版本
