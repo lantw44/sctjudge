@@ -1,0 +1,40 @@
+Name:           @PROGRAM_NAME@
+Version:        @PROGRAM_VERSION@
+Release:        1%{?dist}
+Summary:        Simple common test judge program
+
+Group:          Unknown
+License:        Redistributable but unknown
+URL:            http://www.tfcis.org/~lantw44/programs.html
+Source0:        sctjudge-%{version}.tar.gz
+
+BuildRequires:  gcc glibc-devel libcap libcap-devel
+Requires:       glibc libcap
+
+%description
+一個簡易的程式設計題目評測程式
+
+%prep
+%setup -q
+
+
+%build
+%configure --enable-procmon --enable-cap
+make %{?_smp_mflags}
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make -i install DESTDIR=$RPM_BUILD_ROOT
+
+%post
+setcap 'cap_sys_chroot,cap_setuid,cap_setgid,cap_kill+ep' %{_bindir}/sctjudge
+
+
+%files
+%defattr(-,root,root,-)
+%doc
+%{_bindir}/sctjudge
+
+
+%changelog

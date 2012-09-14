@@ -1,14 +1,13 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.68])
-AC_INIT([sctjudge], [0.9.1], [lantw44@gmail.com])
+AC_INIT([sctjudge], [1.0], [lantw44@gmail.com])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([src/config.h])
 
-releasedate="2012-07-28"
+releasedate="2012-XX-XX"
 
 # Checks for programs.
 AC_PROG_CC
@@ -118,10 +117,11 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime dup2 getpagesize memset setlocale strchr strerror strrchr])
+AC_CHECK_FUNCS([clock_gettime dup2 memset setlocale strchr strerror strrchr],
+		[], AC_MSG_ERROR(This program requires all these functions!))
 
 
-AC_CONFIG_FILES([Makefile src/Makefile src/version.h])
+AC_CONFIG_FILES([Makefile sctjudge.spec src/Makefile src/version.h])
 AC_OUTPUT
 
 echo ""

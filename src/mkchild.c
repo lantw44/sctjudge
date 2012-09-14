@@ -377,7 +377,11 @@ void* sctjudge_makechild(void* arg){
 	/* 建立用來和 chlid process 溝通的 pipe */
 	pipe(childpipe);
 	pthread_mutex_lock(&pidmutex);
+#ifdef HAVE_WORKING_FORK
 	pidchild = fork();
+#else
+#error "This program requires a working fork function."
+#endif
 	if(pidchild < 0){
 #ifndef HAVE_CONF_CAP
 		disable_setuid();
