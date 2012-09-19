@@ -49,8 +49,10 @@ struct makechildopt{
 #define SCTMC_NOCOPY       0x00000002
 #define SCTMC_SETUID       0x00000004
 #define SCTMC_SETGID       0x00000008
-#define SCTMC_VERBOSE      0x00000010
-#define SCTMC_DRYRUN       0x00000020
+#define SCTMC_DRYRUN       0x00000010
+#define SCTMC_FORCE        0x00000020
+#define SCTMC_VERBOSE      0x00000040
+#define SCTMC_DEBUG        0x00000080
 
 /* sctjudge_makechild 的回傳值，main 會接收到 */
 struct makechildrval{

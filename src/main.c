@@ -18,9 +18,39 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-#define SCTMAIN_ERRNOARG "%s: 選項「%s」之後需要一個參數"
-#define SCTMAIN_ERRBADARG "%s: 在「%s」之後有個不存在或用"\
-	"法不正確的參數「%s」\n"
+#include <l4darr.h>
+#include <l4arg.h>
+
+#define SCTMAIN_ERRNOARG "%s: 選項「%s」之後需要一個參數\n"
+#define SCTMAIN_ERRNOQARG "%s: 在「%s」之後缺少一個值\n"
+#define SCTMAIN_ERREXTRAQARG "%s: 在「%s」之後並不需要參數\n"
+
+#define SCTMAIN_CHECKARGEXIST \
+	do{ \
+		i++; \
+		if(i >= argc){ \
+			fprintf(stderr, SCTMAIN_ERRNOARG, argv[0], argv[i-1]); \
+			exit(SCTJUDGE_EXIT_TOOFEW); \
+		} \
+	}while(0) 
+
+#define SCTMAIN_CHECKQARGHAVEVALUE \
+	do{ \
+		if(!l4qarg_hasvalue(qarglist[j])){ \
+			fprintf(stderr, SCTMAIN_ERRNOQARG, \
+					argv[0], qarglist[j].arg_name); \
+			exit(SCTJUDGE_EXIT_TOOFEW); \
+		} \
+	}while(0)
+
+#define SCTMAIN_CHECKQARGNOVALUE \
+	do{ \
+		if(l4qarg_hasvalue(qarglist[j])){ \
+			fprintf(stderr, SCTMAIN_ERREXTRAQARG, \
+					argv[0], qarglist[j].arg_name); \
+			exit(SCTJUDGE_EXIT_SYNTAX); \
+		} \
+	}while(0)
 
 static const char* sctres_text[2][SCTRES_MAX] = {
 	{"OK", "RE", "TLE", "OLE", "SLE", "AB", "UD"},
@@ -35,72 +65,16 @@ static const char* sctres_text[2][SCTRES_MAX] = {
 	}
 };
 
-int getargvint(int* ip, int argc, const char* prearg, const char* arg, 
-		const char* argzero, const char* invalidmsg){
-	int toreturn;
-	(*ip)++;
-	if((*ip) < argc){
-		toreturn = atoi(arg);
-		if(toreturn <= 0){
-			fprintf(stderr, invalidmsg, argzero, arg);
-			exit(SCTJUDGE_EXIT_SYNTAX);
-		}
-	}else{
-		fprintf(stderr, SCTMAIN_ERRNOARG, argzero, prearg);
-		exit(SCTJUDGE_EXIT_SYNTAX);
-	}
-	return toreturn;
-}
-
-char* getargvstr(int* ip, int argc, const char* prearg, const char* arg, 
-		const char* argzero){
-	char* toreturn;
-	(*ip)++;
-	if((*ip) < argc){
-		toreturn = (char*)arg;
-	}else{
-		fprintf(stderr, SCTMAIN_ERRNOARG, argzero, prearg);
-		exit(SCTJUDGE_EXIT_SYNTAX);
-	}
-	return toreturn;
-}
-
-int getargvmulstr(char* arg, char** key, char** value, int* keylen){
-	/* 警告；這個函式 thread unsafe */
-	static char* prearg = NULL;
-	char *tmpstr, *seppos;
-	if(prearg != arg){
-		tmpstr = strtok(arg, ",");
-	}else{
-		tmpstr = strtok(NULL, ",");
-	}
-	prearg = arg;
-	if(tmpstr == NULL){
-		return -1;
-	}else{
-		seppos = strchr(tmpstr, '=');
-		(*key) = tmpstr;
-		if(seppos == NULL){
-			(*value) = NULL;
-		}else{
-			(*keylen) = seppos - tmpstr;
-			(*value) = seppos + 1;
-		}
-		return 0;
-	}
-	return 0;
-}
-
 int main(int argc, char* argv[]){
 	/* 照理說是 zh_TW.utf8，但考慮作業系統差異還是從環境變數抓
 	 * （反正出錯是使用者的事） */
 	setlocale(LC_ALL, ""); 
 
-	int i;
+	int i, j;
 	struct makechildopt mcopt; /* 送給 sctjudge_makechild 當參數用 */
-	char verbose=0, dryrun=0;
-	char *mulstr_key, *mulstr_value;
-	int mulstr_keylen;
+	char verbose=0; /* 0 是安靜模式（機器模式）、1 是 verbose、2 是 debug */
+	char dryrun=0, force=0;
+	L4QARG* qarglist;
 
 	/* 預設值當然都是 0 */
 	memset(&mcopt, 0 ,sizeof(mcopt));
@@ -118,49 +92,51 @@ int main(int argc, char* argv[]){
 					"用法：%s [選項]\n"
 					"選項：\n\n"
 					"  -v/-verbose\n"
-					"      顯示詳細執行過程\n\n"
-					"  -version\n"
+					"      顯示更多訊息（第二個 -v 可以顯示所有重要指令執行過"
+					"程）\n\n"
+					"  -V/version\n"
 					"      顯示版本資訊\n\n"
 					"  -n/-dryrun\n"
 					"      只列出設定值而不要執行（包含 -v）\n\n"
+					"  -f/-force\n"
+					"      忽略警告訊息並強制執行\n\n"
 					"  -t/-time <時間>\n"
 					"      受測程式時間限制為<時間>毫秒\n\n"
-					"  -m/-memory <大小>\n"
-					"      受測程式記憶體限制<大小>MiB\n\n"
+					"  -e/-exec <檔案>\n"
+					"      指定受測程式可執行檔名稱（務必靜態連結！）\n\n"
 					"  -i/-input <檔案>\n"
 					"      指定要導向至受測程式標準輸入的檔案，若未指定則為 "
 					NULL_DEVICE"\n\n"
-					"  -o/-output file=<檔案>[,stderr][,limit=<大小>]\n"
-					"      設定受測程式輸出選項：\n\n"
-					"      file=<檔案>\n"
-					"          指定輸出檔案為<檔案>\n\n"
+					"  -o/-output <檔案>\n"
+					"      指定要導向至受測程式標準輸出的檔案，若未指定則為 "
+					NULL_DEVICE"\n\n"
+					"  -r/-root <目錄>\n"
+					"      受測程式將以<目錄>為根目錄執行，若無此選項則關"
+					"閉 chroot 功能\n\n"
+					"  -m/-misc 選項1[=值],選項2[=值],選項3[=值]...\n"
+					"      設定額外參數：\n\n"
+					"      mem=<大小>\n"
+					"          設定受測程式記憶體上限為<大小>MiB\n\n"
+					"      outlimit=<大小>\n"
+					"          受測程式最多只能輸出<大小>MiB，若未指定則不限制"
+					"\n"
+					"          （無限制時請確定有足夠的磁碟空間！）\n\n"
 					"      stderr\n"
 					"          將受測程式的標準錯誤也導向至輸出檔。若未指定，"
 					"則只有標準輸\n"
 					"          出會寫入輸出檔案，標準錯誤則被導向至 "
 					NULL_DEVICE"\n\n"
-					"      limit=<大小>\n"
-					"          受測程式最多只能輸出<大小>MiB，若未指定則不限制"
-					"\n"
-					"          （無限制時請確定你有足夠的磁碟空間！）\n\n"
-					"  -e/-exec file=<檔案>[,nocopy]\n"
-					"      設定受測程式可執行檔位置：\n\n"
-					"      file=<檔案>\n"
-					"          指定受測程式檔案名稱\n\n"
 					"      nocopy\n"
-					"          如果你啟用了 chroot 功能，預設情況下本程式會自"
-					"動將檔案複製\n"
+					"          如果啟用了 chroot 功能，預設情況下本程式會自動"
+					"將檔案複製\n"
 					"          到新的根目錄中，並在結束時自動刪除檔案。\n"
 					"          使用此選項則取消自動複製的功能，但請注意：此時"
 					" file 指定的\n"
 					"          檔案名稱是相對於新的根目錄而不是現在的根目錄！"
 					"\n\n"
-					"  -chroot <目錄>\n"
-					"          受測程式將以<目錄>為根目錄執行，若無此選項則關"
-					"閉 chroot 功能\n\n"
-					"  -u/-uid <UID>\n"
-					"          受測程式將以 UID 為 <UID> 的使用者身份執行\n"
-					"  -g/-gid <GID>\n"
+					"      uid=<UID>\n"
+					"          受測程式將以 UID 為 <UID> 的使用者身份執行\n\n"
+					"      gid=<GID>\n"
 					"          受測程式將以 GID 為 <GID> 的群組身份執行\n"
 					"          此選項會同時設定 real/effective/supplementary "
 					"GID(s)\n"
@@ -168,94 +144,117 @@ int main(int argc, char* argv[]){
 					"定的數值\n\n"
 					, argv[0]);
 				return SCTJUDGE_EXIT_SUCCESS;
-			}else if(!strcmp(&argv[i][1], "version") ||
+			}else if(!strcmp(&argv[i][1], "V") ||
+					!strcmp(&argv[i][1], "version") ||
 					!strcmp(&argv[i][1], "-version")){
 				puts(SCTJUDGE_TITLEBAR);
 				exit(SCTJUDGE_EXIT_SUCCESS);
 			}else if(!strcmp(&argv[i][1], "v") || 
 					!strcmp(&argv[i][1], "verbose")){
-				verbose = 1;
+				verbose++;
 				mcopt.flags |= SCTMC_VERBOSE;
+				if(verbose >= 2){
+					mcopt.flags |= SCTMC_DEBUG;
+				}
 			}else if(!strcmp(&argv[i][1], "n") || 
 					!strcmp(&argv[i][1], "dryrun")){
 				dryrun = 1, verbose = 1;
 				mcopt.flags |= (SCTMC_DRYRUN | SCTMC_VERBOSE);
+			}else if(!strcmp(&argv[i][1], "f") ||
+					!strcmp(&argv[i][1], "force")){
+				force = 1;
+				mcopt.flags |= (SCTMC_FORCE);
 			}else if(!strcmp(&argv[i][1], "t") ||
 					!strcmp(&argv[i][1], "time")){
-				mcopt.exectime = getargvint(&i, argc, argv[i], argv[i+1], 
-						argv[0], "%s: 「%s」不是正確的時間設定值\n");
-			}else if(!strcmp(&argv[i][1], "m") ||
-					!strcmp(&argv[i][1], "memory")){
-				mcopt.memlimit = getargvint(&i, argc, argv[i], argv[i+1],
-						argv[0], "%s: 「%s」不是正確的記憶體大小設定\n");
-			}else if(!strcmp(&argv[i][1], "i") ||
-					!strcmp(&argv[i][1], "input")){
-				mcopt.inputfile = getargvstr(&i, argc, argv[i], argv[i+1],
-					   	argv[0]);
-			}else if(!strcmp(&argv[i][1], "o") ||
-					!strcmp(&argv[i][1], "output")){
-				getargvstr(&i, argc, argv[i], argv[i+1], argv[0]);
-				while(getargvmulstr(argv[i], &mulstr_key, &mulstr_value,
-							&mulstr_keylen) >= 0){
-					if(mulstr_value == NULL){
-						if(!strcmp(mulstr_key, "stderr")){
-							mcopt.flags |= SCTMC_REDIR_STDERR;
-						}else{
-							fprintf(stderr, SCTMAIN_ERRBADARG
-									, argv[0], argv[i-1], mulstr_key);
-							exit(SCTJUDGE_EXIT_SYNTAX);
-						}
-					}else{
-						if(!strncmp(mulstr_key, "limit", mulstr_keylen)){
-							mcopt.outlimit = atoi(mulstr_value);
-							if(mcopt.outlimit <= 0){
-								fprintf(stderr, "%s: 「%s」不是正確的輸出限制"
-										"值\n", argv[0], mulstr_value);
-								exit(SCTJUDGE_EXIT_SYNTAX);
-							}
-						}else if(!strncmp(mulstr_key, "file", mulstr_keylen)){
-							mcopt.outputfile = mulstr_value;
-						}else{
-							fprintf(stderr, SCTMAIN_ERRBADARG
-									, argv[0], argv[i-1], mulstr_key);
-							exit(SCTJUDGE_EXIT_SYNTAX);
-						}
-					}
+				SCTMAIN_CHECKARGEXIST;
+				mcopt.exectime = atoi(argv[i]);
+				if(mcopt.exectime <= 0){
+					fprintf(stderr, "%s: 「%s」不是正確的時間設定值\n", 
+							argv[0], argv[i]);
+					exit(SCTJUDGE_EXIT_SYNTAX);
 				}
 			}else if(!strcmp(&argv[i][1], "e") ||
 					!strcmp(&argv[i][1], "exec")){
-				getargvstr(&i, argc, argv[i], argv[i+1], argv[0]);
-				while(getargvmulstr(argv[i], &mulstr_key, &mulstr_value, 
-							&mulstr_keylen) >= 0){
-					if(mulstr_value == NULL){
-						if(!strcmp(mulstr_key, "nocopy")){
-							mcopt.flags |= SCTMC_NOCOPY;
-						}else{
-							fprintf(stderr, SCTMAIN_ERRBADARG, 
-									argv[0], argv[i-1], mulstr_key);
+				SCTMAIN_CHECKARGEXIST;
+				mcopt.executable = argv[i];
+			}else if(!strcmp(&argv[i][1], "i") ||
+					!strcmp(&argv[i][1], "in") ||
+					!strcmp(&argv[i][1], "input")){
+				SCTMAIN_CHECKARGEXIST;
+				mcopt.inputfile = argv[i];
+			}else if(!strcmp(&argv[i][1], "o") ||
+					!strcmp(&argv[i][1], "out") ||
+					!strcmp(&argv[i][1], "output")){
+				SCTMAIN_CHECKARGEXIST;
+				mcopt.outputfile = argv[i];
+			}else if(!strcmp(&argv[i][1], "r") ||
+					!strcmp(&argv[i][1], "root") ||
+					!strcmp(&argv[i][1], "chroot")){
+				SCTMAIN_CHECKARGEXIST;
+				mcopt.executable = argv[i];
+			}else if(!strcmp(&argv[i][1], "m") ||
+					!strcmp(&argv[i][1], "misc") ||
+					!strcmp(&argv[i][1], "opt") ||
+					!strcmp(&argv[i][1], "option")){
+				SCTMAIN_CHECKARGEXIST;
+				qarglist = l4qarg_parse(argv[i]);
+				if(qarglist == NULL){
+					fprintf(stderr, "%s: 記憶體配置發生錯誤\n", argv[0]);
+					exit(SCTJUDGE_EXIT_MALLOC);
+				}
+				for(j=0; !l4qarg_end(qarglist[j]); j++){
+					if(!strcmp(qarglist[j].arg_name, "mem") ||
+						!strcmp(qarglist[j].arg_name, "memory")){
+						SCTMAIN_CHECKQARGHAVEVALUE;
+						mcopt.memlimit = atoi(qarglist[j].arg_value);
+						if(mcopt.memlimit <= 0){
+							fprintf(stderr, "%s: 「%s」不是正確的記憶體限制"
+									"設定值\n", argv[0], 
+									qarglist[j].arg_value);
+							exit(SCTJUDGE_EXIT_SYNTAX);
+						}
+					}else if(!strcmp(qarglist[j].arg_name, "outlimit") ||
+							!strcmp(qarglist[j].arg_name, "outlim")){
+						SCTMAIN_CHECKQARGHAVEVALUE;
+						mcopt.outlimit = atoi(qarglist[j].arg_value);
+						if(mcopt.outlimit <= 0){
+							fprintf(stderr, "%s: 「%s」不是正確的輸出限制"
+									"設定\n", argv[0], qarglist[j].arg_value);
+							exit(SCTJUDGE_EXIT_SYNTAX);
+						}
+					}else if(!strcmp(qarglist[j].arg_name, "stderr")){
+						SCTMAIN_CHECKQARGNOVALUE;
+						mcopt.flags |= SCTMC_REDIR_STDERR;
+					}else if(!strcmp(qarglist[j].arg_name, "nocopy")){
+						SCTMAIN_CHECKQARGNOVALUE;
+						mcopt.flags |= SCTMC_NOCOPY;
+					}else if(!strcmp(qarglist[j].arg_name, "uid") ||
+							!strcmp(qarglist[j].arg_name, "user")){
+						SCTMAIN_CHECKQARGHAVEVALUE;
+						mcopt.flags |= SCTMC_SETUID;
+						if(sscanf(qarglist[j].arg_value, "%d", &mcopt.uid) 
+								<= 0){
+							fprintf(stderr, "%s: 「%s」並不是整數\n", 
+									argv[0], qarglist[j].arg_value);
+							exit(SCTJUDGE_EXIT_SYNTAX);
+						}
+					}else if(!strcmp(qarglist[j].arg_name, "gid") ||
+							!strcmp(qarglist[j].arg_name, "group")){
+						SCTMAIN_CHECKQARGHAVEVALUE;
+						mcopt.flags |= SCTMC_SETGID;
+						if(sscanf(qarglist[j].arg_value, "%d", &mcopt.gid) 
+								<= 0){
+							fprintf(stderr, "%s: 「%s」並不是整數\n", 
+									argv[0], qarglist[j].arg_value);
 							exit(SCTJUDGE_EXIT_SYNTAX);
 						}
 					}else{
-						if(!strncmp(mulstr_key, "file", mulstr_keylen)){
-							mcopt.executable = mulstr_value;
-						}else{
-							fprintf(stderr, SCTMAIN_ERRBADARG
-									, argv[0], argv[i-1], mulstr_key);
-							exit(SCTJUDGE_EXIT_SYNTAX);
-						}
+						fprintf(stderr, "%s: 「%s」是不明的選項\n", argv[0],
+								qarglist[j].arg_name);
+						exit(SCTJUDGE_EXIT_SYNTAX);
 					}
 				}
-			}else if(!strcmp(&argv[i][1], "chroot")){
-				mcopt.chrootdir = getargvstr(&i, argc, argv[i], argv[i+1],
-						argv[0]);
-			}else if(!strcmp(&argv[i][1], "u") || !strcmp(&argv[i][1], "uid")){
-				mcopt.flags |= SCTMC_SETUID;
-				mcopt.uid = getargvint(&i, argc, argv[i], argv[i+1],
-						argv[0], "%s: 指定 UID 為「%s」不安全或不合理\n");
-			}else if(!strcmp(&argv[i][1], "g") || !strcmp(&argv[i][1], "gid")){
-				mcopt.flags |= SCTMC_SETGID;
-				mcopt.gid = getargvint(&i, argc, argv[i], argv[i+1],
-						argv[0], "%s: 指定 GID 為「%s」不安全或不合理\n");
+				l4qarg_free(qarglist);
 			}else{
 				fprintf(stderr, "%s: 不明的選項「%s」\n", argv[0], argv[i]);
 				return SCTJUDGE_EXIT_SYNTAX;

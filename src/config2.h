@@ -9,4 +9,5 @@
 #define SCTJUDGE_EXIT_SUCCESS 0  /* 當然就是正常結束 */
 #define SCTJUDGE_EXIT_SYNTAX  1  /* 命令列語法錯誤 */
 #define SCTJUDGE_EXIT_TOOFEW  2  /* 少了一些必須的選項 */
-#define SCTJUDGE_EXIT_THREAD  3  /* pthread_create 以後才發生錯誤 */
+#define SCTJUDGE_EXIT_MALLOC  3  /* 配置記憶體發生錯誤 */
+#define SCTJUDGE_EXIT_THREAD  4  /* pthread_create 以後才發生錯誤 */

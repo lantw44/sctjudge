@@ -1,0 +1,13 @@
+l4arg: 
+    (Argument) 解析命令列的常用函式
+l4bds: 
+    (Basic Data Structure) 包含 list、stack、queue，其中 stack 和 queue 其實都
+    是用 list 實作
+l4darr: 
+    (Dynamic Array) 包含可動態調整大小的一維陣列（類似 C++ 的 vector），還有透
+    或一維陣列模擬二維陣列的功能（但不可動態調整大小）
+
+基本上這些函式庫都很小，所以請直接靜態連結到你的程式，不要安裝到系統上！
+同時預設的 Makefile 也不提供建立動態函式庫的功能，有需要請自行處理！
+
+本函式庫使用 Public Domain 釋出，歡迎自行修改以符合需求！
