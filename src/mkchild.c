@@ -238,12 +238,12 @@ static void sctjudge_list_settings(const struct makechildopt* mcopt){
 		puts("無限制");
 	}
 	if(mcopt->flags & SCTMC_SETUID){
-		printf("\t設定受測程式執行時的 UID 為 %d\n", mcopt->uid);
+		printf("\t設定受測程式執行時的 UID 為 %u\n", mcopt->uid);
 	}else{
 		puts("\t執行受測程式時維持原有的 real UID 和 effective UID");
 	}
 	if(mcopt->flags & SCTMC_SETGID){
-		printf("\t設定受測程式執行時的 GID 為 %d\n", mcopt->gid);
+		printf("\t設定受測程式執行時的 GID 為 %u\n", mcopt->gid);
 	}else{
 		puts("\t執行受測程式時維持原有的 real GID、effective GID "
 				"和 supplementary GID");

@@ -9,9 +9,6 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-#define NULL_DEVICE	"/dev/null"
-
-
 /* mkchild.c */
 
 /* 子程序 PID 和對應的 mutex */

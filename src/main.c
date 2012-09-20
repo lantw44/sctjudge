@@ -30,7 +30,7 @@
 		i++; \
 		if(i >= argc){ \
 			fprintf(stderr, SCTMAIN_ERRNOARG, argv[0], argv[i-1]); \
-			exit(SCTJUDGE_EXIT_TOOFEW); \
+			exit(SCTEXIT_SYNTAX); \
 		} \
 	}while(0) 
 
@@ -39,7 +39,7 @@
 		if(!l4qarg_hasvalue(qarglist[j])){ \
 			fprintf(stderr, SCTMAIN_ERRNOQARG, \
 					argv[0], qarglist[j].arg_name); \
-			exit(SCTJUDGE_EXIT_TOOFEW); \
+			exit(SCTEXIT_SYNTAX); \
 		} \
 	}while(0)
 
@@ -48,7 +48,7 @@
 		if(l4qarg_hasvalue(qarglist[j])){ \
 			fprintf(stderr, SCTMAIN_ERREXTRAQARG, \
 					argv[0], qarglist[j].arg_name); \
-			exit(SCTJUDGE_EXIT_SYNTAX); \
+			exit(SCTEXIT_SYNTAX); \
 		} \
 	}while(0)
 
@@ -143,12 +143,12 @@ int main(int argc, char* argv[]){
 					"          原有的 supplementry GIDs 會被清空，只剩下這裡指"
 					"定的數值\n\n"
 					, argv[0]);
-				return SCTJUDGE_EXIT_SUCCESS;
+				return SCTEXIT_SUCCESS;
 			}else if(!strcmp(&argv[i][1], "V") ||
 					!strcmp(&argv[i][1], "version") ||
 					!strcmp(&argv[i][1], "-version")){
 				puts(SCTJUDGE_TITLEBAR);
-				exit(SCTJUDGE_EXIT_SUCCESS);
+				exit(SCTEXIT_SUCCESS);
 			}else if(!strcmp(&argv[i][1], "v") || 
 					!strcmp(&argv[i][1], "verbose")){
 				verbose++;
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]){
 				if(mcopt.exectime <= 0){
 					fprintf(stderr, "%s: 「%s」不是正確的時間設定值\n", 
 							argv[0], argv[i]);
-					exit(SCTJUDGE_EXIT_SYNTAX);
+					exit(SCTEXIT_SYNTAX);
 				}
 			}else if(!strcmp(&argv[i][1], "e") ||
 					!strcmp(&argv[i][1], "exec")){
@@ -200,7 +200,7 @@ int main(int argc, char* argv[]){
 				qarglist = l4qarg_parse(argv[i]);
 				if(qarglist == NULL){
 					fprintf(stderr, "%s: 記憶體配置發生錯誤\n", argv[0]);
-					exit(SCTJUDGE_EXIT_MALLOC);
+					exit(SCTEXIT_MALLOC);
 				}
 				for(j=0; !l4qarg_end(qarglist[j]); j++){
 					if(!strcmp(qarglist[j].arg_name, "mem") ||
@@ -211,7 +211,7 @@ int main(int argc, char* argv[]){
 							fprintf(stderr, "%s: 「%s」不是正確的記憶體限制"
 									"設定值\n", argv[0], 
 									qarglist[j].arg_value);
-							exit(SCTJUDGE_EXIT_SYNTAX);
+							exit(SCTEXIT_SYNTAX);
 						}
 					}else if(!strcmp(qarglist[j].arg_name, "outlimit") ||
 							!strcmp(qarglist[j].arg_name, "outlim")){
@@ -220,7 +220,7 @@ int main(int argc, char* argv[]){
 						if(mcopt.outlimit <= 0){
 							fprintf(stderr, "%s: 「%s」不是正確的輸出限制"
 									"設定\n", argv[0], qarglist[j].arg_value);
-							exit(SCTJUDGE_EXIT_SYNTAX);
+							exit(SCTEXIT_SYNTAX);
 						}
 					}else if(!strcmp(qarglist[j].arg_name, "stderr")){
 						SCTMAIN_CHECKQARGNOVALUE;
@@ -232,38 +232,38 @@ int main(int argc, char* argv[]){
 							!strcmp(qarglist[j].arg_name, "user")){
 						SCTMAIN_CHECKQARGHAVEVALUE;
 						mcopt.flags |= SCTMC_SETUID;
-						if(sscanf(qarglist[j].arg_value, "%d", &mcopt.uid) 
+						if(sscanf(qarglist[j].arg_value, "%u", &mcopt.uid) 
 								<= 0){
 							fprintf(stderr, "%s: 「%s」並不是整數\n", 
 									argv[0], qarglist[j].arg_value);
-							exit(SCTJUDGE_EXIT_SYNTAX);
+							exit(SCTEXIT_SYNTAX);
 						}
 					}else if(!strcmp(qarglist[j].arg_name, "gid") ||
 							!strcmp(qarglist[j].arg_name, "group")){
 						SCTMAIN_CHECKQARGHAVEVALUE;
 						mcopt.flags |= SCTMC_SETGID;
-						if(sscanf(qarglist[j].arg_value, "%d", &mcopt.gid) 
+						if(sscanf(qarglist[j].arg_value, "%u", &mcopt.gid) 
 								<= 0){
 							fprintf(stderr, "%s: 「%s」並不是整數\n", 
 									argv[0], qarglist[j].arg_value);
-							exit(SCTJUDGE_EXIT_SYNTAX);
+							exit(SCTEXIT_SYNTAX);
 						}
 					}else{
 						fprintf(stderr, "%s: 「%s」是不明的選項\n", argv[0],
 								qarglist[j].arg_name);
-						exit(SCTJUDGE_EXIT_SYNTAX);
+						exit(SCTEXIT_SYNTAX);
 					}
 				}
 				l4qarg_free(qarglist);
 			}else{
 				fprintf(stderr, "%s: 不明的選項「%s」\n", argv[0], argv[i]);
-				return SCTJUDGE_EXIT_SYNTAX;
+				return SCTEXIT_SYNTAX;
 			}
 		}else{
 			fprintf(stderr, "%s: 參數 %d「%s」是多餘的\n"
 				"請嘗試執行 %s -help 來取得說明\n"
 				, argv[0], i, argv[i], argv[0]);
-			return SCTJUDGE_EXIT_SYNTAX;
+			return SCTEXIT_SYNTAX;
 		}
 	}
 	/* 至此可以進入主程式了 */
@@ -284,18 +284,29 @@ int main(int argc, char* argv[]){
 	}
 	if(mcopt.executable == NULL){
 		fputs("受測程式可執行檔名稱為必要參數，不可為空白\n", stderr);
-		exit(SCTJUDGE_EXIT_TOOFEW);
+		exit(SCTEXIT_TOOFEW);
 	}
 	if(mcopt.inputfile == NULL){
 		mcopt.inputfile = NULL_DEVICE;
 	}
 	if(mcopt.outputfile == NULL){
 		fputs("輸出檔案名稱必要參數，不可為空白\n", stderr);
-		exit(SCTJUDGE_EXIT_TOOFEW);
+		exit(SCTEXIT_TOOFEW);
 	}
 	if(mcopt.exectime <= 0){
 		fputs("執行時間限制為必要參數，不可為空白！\n", stderr);
-		exit(SCTJUDGE_EXIT_TOOFEW);
+		exit(SCTEXIT_TOOFEW);
+	}
+	if((mcopt.flags & SCTMC_SETUID) && (mcopt.uid == 0)){
+		if(!force){
+			fputs("將 UID 設為 0 並不安全！（加上 -f 來強制執行）\n", stderr);
+			exit(SCTEXIT_BADID);
+		}else{
+			if(getuid() != 0){
+				fputs("只有 root 可以將 UID 設定 0\n", stderr);
+				exit(SCTEXIT_BADID);
+			}
+		}
 	}
 
 	/* 現在開始建立 thread 了！*/
@@ -342,7 +353,7 @@ int main(int argc, char* argv[]){
 	pthread_mutex_destroy(&tdisplay_mx);
 
 	if(dryrun){
-		return SCTJUDGE_EXIT_SUCCESS;
+		return SCTEXIT_SUCCESS;
 	}
 
 	/* 這裡就要顯示結果了 */
@@ -350,7 +361,7 @@ int main(int argc, char* argv[]){
 		fprintf(stderr, "%s: 因錯誤發生而結束程式\n", argv[0]);
 		free((void*)mtreturn);
 		sem_destroy(&mcthr);
-		exit(SCTJUDGE_EXIT_THREAD);
+		exit(SCTEXIT_THREAD);
 	}else{
 		if(verbose){
 			putchar('\r');
@@ -397,5 +408,5 @@ int main(int argc, char* argv[]){
 		}
 		free((void*)mtreturn);
 	}
-	return SCTJUDGE_EXIT_SUCCESS;
+	return SCTEXIT_SUCCESS;
 }
