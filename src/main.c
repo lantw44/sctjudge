@@ -12,8 +12,11 @@
 #include <string.h>
 #include <locale.h>
 #include <time.h>
+#include <grp.h>
+#include <pwd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/types.h>
 
 #include <pthread.h>
 #include <semaphore.h>
@@ -75,6 +78,10 @@ int main(int argc, char* argv[]){
 	char verbose=0; /* 0 是安靜模式（機器模式）、1 是 verbose、2 是 debug */
 	char dryrun=0, force=0;
 	L4QARG* qarglist;
+#ifdef HAVE_CONF_UGIDNAME
+	struct passwd* pwinfo;
+	struct group* grinfo;
+#endif
 
 	/* 預設值當然都是 0 */
 	memset(&mcopt, 0 ,sizeof(mcopt));
@@ -234,9 +241,20 @@ int main(int argc, char* argv[]){
 						mcopt.flags |= SCTMC_SETUID;
 						if(sscanf(qarglist[j].arg_value, "%u", &mcopt.uid) 
 								<= 0){
-							fprintf(stderr, "%s: 「%s」並不是整數\n", 
+#ifdef HAVE_CONF_UGIDNAME
+							pwinfo = getpwnam(qarglist[j].arg_value);
+							if(pwinfo == NULL){
+								fprintf(stderr, "%s: 「%s」不是正確的 UID 或"
+										"使用者名稱\n", 
+										argv[0], qarglist[j].arg_value);
+								exit(SCTEXIT_SYNTAX);
+							}
+							mcopt.uid = pwinfo->pw_uid;
+#else
+							fprintf(stderr, "%s: 「%s」並不是整數\n",
 									argv[0], qarglist[j].arg_value);
 							exit(SCTEXIT_SYNTAX);
+#endif
 						}
 					}else if(!strcmp(qarglist[j].arg_name, "gid") ||
 							!strcmp(qarglist[j].arg_name, "group")){
@@ -244,9 +262,20 @@ int main(int argc, char* argv[]){
 						mcopt.flags |= SCTMC_SETGID;
 						if(sscanf(qarglist[j].arg_value, "%u", &mcopt.gid) 
 								<= 0){
-							fprintf(stderr, "%s: 「%s」並不是整數\n", 
+#ifdef HAVE_CONF_UGIDNAME
+							grinfo = getgrnam(qarglist[j].arg_value);
+							if(grinfo == NULL){
+								fprintf(stderr, "%s: 「%s」不是正確的 GID 或"
+										"群組名稱\n", 
+										argv[0], qarglist[j].arg_value);
+								exit(SCTEXIT_SYNTAX);
+							}
+							mcopt.gid = grinfo->gr_gid;
+#else
+							fprintf(stderr, "%s: 「%s」並不是整數\n",
 									argv[0], qarglist[j].arg_value);
 							exit(SCTEXIT_SYNTAX);
+#endif
 						}
 					}else{
 						fprintf(stderr, "%s: 「%s」是不明的選項\n", argv[0],

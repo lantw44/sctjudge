@@ -117,9 +117,12 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime dup2 memset setlocale strchr strerror strrchr],
+AC_CHECK_FUNCS([clock_gettime dup2 memset setlocale strchr strerror strrchr getuid getpid setpgid wait4 fcntl fchown open close setrlimit chmod unlink],
 		[], AC_MSG_ERROR(This program requires all these functions!))
 
+AC_CHECK_FUNCS([getpwnam getgrnam getpwuid getgrgid],
+		AC_DEFINE([HAVE_CONF_UGIDNAME], [1], 
+			[Conversion between user or group ID and name]), [])
 
 AC_CONFIG_FILES([Makefile sctjudge.spec src/Makefile src/version.h])
 AC_OUTPUT
