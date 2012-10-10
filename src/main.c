@@ -198,7 +198,7 @@ int main(int argc, char* argv[]){
 					!strcmp(&argv[i][1], "root") ||
 					!strcmp(&argv[i][1], "chroot")){
 				SCTMAIN_CHECKARGEXIST;
-				mcopt.executable = argv[i];
+				mcopt.chrootdir = argv[i];
 			}else if(!strcmp(&argv[i][1], "m") ||
 					!strcmp(&argv[i][1], "misc") ||
 					!strcmp(&argv[i][1], "opt") ||
