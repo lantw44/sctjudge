@@ -326,15 +326,24 @@ int main(int argc, char* argv[]){
 		fputs("執行時間限制為必要參數，不可為空白！\n", stderr);
 		exit(SCTEXIT_TOOFEW);
 	}
-	if((mcopt.flags & SCTMC_SETUID) && (mcopt.uid == 0)){
-		if(!force){
-			fputs("將 UID 設為 0 並不安全！（加上 -f 來強制執行）\n", stderr);
-			exit(SCTEXIT_BADID);
-		}else{
-			if(getuid() != 0){
-				fputs("只有 root 可以將 UID 設定 0\n", stderr);
+	if((mcopt.flags & SCTMC_SETUID)){
+		if(mcopt.uid == 0){
+			if(!force){
+				fputs("將 UID 設為 0 並不安全！（加上 -f 來強制執行）\n", 
+						stderr);
 				exit(SCTEXIT_BADID);
+			}else{
+				if(getuid() != 0){
+					fputs("只有 root 可以將 UID 設定 0\n", stderr);
+					exit(SCTEXIT_BADID);
+				}
 			}
+		}
+	}else{
+		if(getuid() == 0 && !force){
+			fputs("不允許以 root 身份執行本程式（加上 -f 來強制執行）\n", 
+					stderr);
+			exit(SCTEXIT_BADID);
 		}
 	}
 
