@@ -24,7 +24,7 @@ void* sctjudge_dispaytime(void* arg){
 
 	pid_t pidcopy;
 
-	const char* sysstatfile = "/proc/stat";
+	const char* sysstatfile = PROC_PATH"stat";
 	char statfile[25], statusfile[25];
 	FILE *statp, *statusp, *sysstatp;
 
@@ -60,8 +60,8 @@ void* sctjudge_dispaytime(void* arg){
 #endif
 
 #ifdef HAVE_CONF_PROCMON
-	sprintf(statfile, "/proc/%d/stat", pidcopy);
-	sprintf(statusfile, "/proc/%d/status", pidcopy);
+	sprintf(statfile, PROC_PATH"/%d/stat", pidcopy);
+	sprintf(statusfile, PROC_PATH"/%d/status", pidcopy);
 #endif
 
 	while(1){

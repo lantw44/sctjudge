@@ -8,6 +8,9 @@
 /* XXX 這個看能不能用 GNU autotool 取代，我可不確定 /dev/null 永遠存在！*/
 #define NULL_DEVICE	"/dev/null"
 
+/* TODO 定義 Linux proc 檔案系統在哪裡，之後會用 GNU autotool 取代 */
+#define PROC_PATH "/proc"
+
 /* sctjudge 這個程式的 exit status */
 #define SCTEXIT_SUCCESS 0  /* 當然就是正常結束 */
 #define SCTEXIT_SYNTAX  1  /* 解析階段：命令列語法錯誤 */
