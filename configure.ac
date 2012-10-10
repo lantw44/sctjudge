@@ -121,17 +121,24 @@ AC_CHECK_FUNCS([clock_gettime dup2 memset setlocale strchr strerror strrchr getu
 		[], AC_MSG_ERROR(This program requires all these functions!))
 
 AC_CHECK_FUNCS([getpwnam getgrnam getpwuid getgrgid],
-		AC_DEFINE([HAVE_CONF_UGIDNAME], [1], 
-			[Conversion between user or group ID and name]), [])
+		opt_ugidname=yes, opt_ugidname=no)
+
+test x"${opt_ugidname}" = xyes && \
+		 AC_DEFINE([HAVE_CONF_UGIDNAME], [1], 
+		[Conversion between user or group ID and name])
 
 AC_CONFIG_FILES([Makefile sctjudge.spec src/Makefile src/version.h])
 AC_OUTPUT
 
-echo ""
-echo "Optional Features:"
-echo "(1) Process monitor using Linux /proc filesystem .... $opt_procmon"
-echo "(2) Linux capabilities support ...................... $opt_cap"
-echo "-------------------------------------------------------------"
-echo "Compiling and Linking Options:"
-echo "(1) Debugging information ........................... $opt_debug"
-echo "(2) Statically linked executable .................... $opt_static"
+confmsgsave="config.msg"
+
+echo "" | tee "$confmsgsave"
+echo "Optional Features:" | tee -a "$confmsgsave"
+echo "(1) Conversion between user or group ID and name .... $opt_ugidname" | tee -a "$confmsgsave"
+echo "(2) Process monitor using Linux /proc filesystem .... $opt_procmon" | tee -a "$confmsgsave"
+echo "(3) Linux capabilities support ...................... $opt_cap" | tee -a "$confmsgsave"
+echo "-------------------------------------------------------------" | tee -a "$confmsgsave"
+echo "Compiling and Linking Options:" | tee -a "$confmsgsave"
+echo "(1) Debugging information ........................... $opt_debug" | tee -a "$confmsgsave"
+echo "(2) Statically linked executable .................... $opt_static" | tee -a "$confmsgsave"
+echo "The above messages has been written to $confmsgsave"
