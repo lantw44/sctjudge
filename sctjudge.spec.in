@@ -3,8 +3,8 @@ Version:        @PROGRAM_VERSION@
 Release:        1%{?dist}
 Summary:        Simple common test judge program
 
-Group:          Unknown
-License:        Redistributable but unknown
+Group:          Applications
+License:        3-clause BSD license
 URL:            http://www.tfcis.org/~lantw44/programs.html
 Source0:        sctjudge-%{version}.tar.gz
 
