@@ -227,13 +227,13 @@ static void sctjudge_list_settings(const struct makechildopt* mcopt){
 	printf("\t執行時間限制：%d 毫秒\n", mcopt->exectime);
 	fputs("\t記憶體使用量限制：", stdout);
 	if(mcopt->memlimit > 0){
-		printf("%d MiB\n", mcopt->memlimit);
+		printf("%d 位元組\n", mcopt->memlimit);
 	}else{
 		puts("無限制");
 	}
 	fputs("\t輸出限制：", stdout);
 	if(mcopt->outlimit > 0){
-		printf("%d MiB\n", mcopt->outlimit);
+		printf("%d 位元組\n", mcopt->outlimit);
 	}else{
 		puts("無限制");
 	}
@@ -625,7 +625,7 @@ void* sctjudge_makechild(void* arg){
 
 		/* 開始設定資源限制 */
 		if(mcopt.memlimit > 0){
-			childressize = mcopt.memlimit * 1024 * 1024;
+			childressize = mcopt.memlimit;
 			childres.rlim_cur = childressize;
 			childres.rlim_max = childressize;
 			if(setrlimit(RLIMIT_AS, &childres) < 0){
@@ -637,7 +637,7 @@ void* sctjudge_makechild(void* arg){
 		}
 
 		if(mcopt.outlimit > 0){
-			childressize = mcopt.outlimit * 1024 * 1024;
+			childressize = mcopt.outlimit;
 			childres.rlim_cur = childressize;
 			childres.rlim_max = childressize;
 			if(setrlimit(RLIMIT_FSIZE, &childres) < 0){
