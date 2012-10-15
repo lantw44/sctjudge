@@ -4,7 +4,7 @@
 
 #include "config2.h"
 #include "common.h"
-#include "core.h"
+#include "sctcore.h"
 
 #include <stdio.h>
 #include <string.h>

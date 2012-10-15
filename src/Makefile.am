@@ -2,7 +2,7 @@ bin_PROGRAMS = sctjudge
 sctjudge_CFLAGS = -Wall -pipe -pthread -I../l4basic/l4darr -I../l4basic/l4arg
 sctjudge_LDFLAGS = -L../l4basic/l4darr -L../l4basic/l4arg
 sctjudge_LDADD = -ll4arg -ll4darr
-sctjudge_SOURCES = common.c common.h config.h core.h disptime.c checktle.c\
+sctjudge_SOURCES = common.c common.h config.h sctcore.h disptime.c checktle.c\
 				   main.c mkchild.c version.h config2.h
 
 if STATIC_EXEC
