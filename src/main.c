@@ -102,7 +102,7 @@ int main(int argc, char* argv[]){
 					"      顯示更多訊息（第二個 -v 可以顯示所有重要指令執行過"
 					"程）\n\n"
 					"  -V/version\n"
-					"      顯示版本資訊\n\n"
+					"      顯示版本資訊並查看可使用的額外功能列表\n\n"
 					"  -n/-dryrun\n"
 					"      只列出設定值而不要執行（包含 -v）\n\n"
 					"  -f/-force\n"
@@ -123,10 +123,10 @@ int main(int argc, char* argv[]){
 					"  -m/-misc 選項1[=值],選項2[=值],選項3[=值]...\n"
 					"      設定額外參數：\n\n"
 					"      mem=<大小>\n"
-					"          設定受測程式記憶體上限為<大小>MiB\n\n"
+					"          設定受測程式記憶體上限為<大小>位元組\n\n"
 					"      outlimit=<大小>\n"
-					"          受測程式最多只能輸出<大小>MiB，若未指定則不限制"
-					"\n"
+					"          受測程式最多只能輸出<大小>位元組，若未指定則不"
+					"限制\n"
 					"          （無限制時請確定有足夠的磁碟空間！）\n\n"
 					"      stderr\n"
 					"          將受測程式的標準錯誤也導向至輸出檔。若未指定，"
@@ -155,6 +155,40 @@ int main(int argc, char* argv[]){
 					!strcmp(&argv[i][1], "version") ||
 					!strcmp(&argv[i][1], "-version")){
 				puts(SCTJUDGE_TITLEBAR);
+				putchar('\n');
+				printf("目前可用(+)和不可用(-)的功能列表：\n"
+#ifdef HAVE_CONF_PROCMON
+						"  + "
+#else
+						"  - "
+#endif
+						"使用 Linux 的 proc 檔案系統來增強程序監視器的功能 (--"
+#ifdef HAVE_CONF_PROCMON
+						"enable"
+#else
+						"disable"
+#endif
+						"-procmon)\n"
+#ifdef HAVE_CONF_CAP
+						"  + "
+#else
+						"  - "
+#endif
+						"支援 Linux capabilities (--"
+#ifdef HAVE_CONF_CAP
+						"enable"
+#else
+						"disable"
+#endif
+						"-cap)\n"
+#ifdef HAVE_CONF_UGIDNAME
+						"  + "
+#else
+						"  - "
+#endif
+						"自動轉換使用者或群組名稱成 UID 或 GID "
+						"(自動偵測)\n"
+						);
 				exit(SCTEXIT_SUCCESS);
 			}else if(!strcmp(&argv[i][1], "v") || 
 					!strcmp(&argv[i][1], "verbose")){

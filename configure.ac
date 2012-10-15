@@ -43,7 +43,7 @@ AM_CONDITIONAL([STATIC_EXEC], [test x"${opt_static}" = xyes])
 # 有些功能是選用的......
 AC_ARG_ENABLE([procmon], 
 	[AS_HELP_STRING([--enable-procmon], 
-		[enable process monitor using Linux /proc filesystem])],
+		[enable process monitor using Linux proc filesystem])],
 	[opt_procmon=$enableval], [opt_procmon=no])
 
 test x"${opt_procmon}" = xyes && \
@@ -135,7 +135,7 @@ confmsgsave="config.msg"
 echo "" | tee "$confmsgsave"
 echo "Optional Features:" | tee -a "$confmsgsave"
 echo "(1) Conversion between user or group ID and name .... $opt_ugidname" | tee -a "$confmsgsave"
-echo "(2) Process monitor using Linux /proc filesystem .... $opt_procmon" | tee -a "$confmsgsave"
+echo "(2) Process monitor using Linux proc filesystem ..... $opt_procmon" | tee -a "$confmsgsave"
 echo "(3) Linux capabilities support ...................... $opt_cap" | tee -a "$confmsgsave"
 echo "-------------------------------------------------------------" | tee -a "$confmsgsave"
 echo "Compiling and Linking Options:" | tee -a "$confmsgsave"
