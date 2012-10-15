@@ -24,7 +24,7 @@ void* sctjudge_dispaytime(void* arg){
 
 	pid_t pidcopy;
 
-	const char* sysstatfile = PROC_PATH"stat";
+	const char* sysstatfile = PROC_PATH"/stat";
 	char statfile[25], statusfile[25];
 	FILE *statp, *statusp, *sysstatp;
 
