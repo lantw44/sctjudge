@@ -1,5 +1,6 @@
 bin_PROGRAMS = sctjudge
-sctjudge_CFLAGS = -Wall -pipe -pthread -I../l4basic/l4darr -I../l4basic/l4arg
+sctjudge_CFLAGS = -Wall -pipe -pthread -I../l4basic/l4darr -I../l4basic/l4arg\
+				  -D_REENTRANT -D_THREAD_SAFE
 sctjudge_LDFLAGS = -L../l4basic/l4darr -L../l4basic/l4arg
 sctjudge_LDADD = -ll4arg -ll4darr
 sctjudge_SOURCES = common.c common.h config.h sctcore.h disptime.c checktle.c\
