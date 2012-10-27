@@ -6,6 +6,7 @@ AM_INIT_AUTOMAKE([foreign -Wall])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_FILES([Makefile sctjudge.spec src/Makefile src/version.h])
 
 releasedate="2012-10-27"
 rpmversion="1.0"
@@ -14,9 +15,27 @@ rpmversion="1.0"
 AC_PROG_CC
 AM_PROG_CC_C_O
 
+# 寫入版本資訊
+AC_SUBST([PROGRAM_NAME], [AC_PACKAGE_NAME])
+AC_SUBST([PROGRAM_VERSION], [AC_PACKAGE_VERSION])
+AC_SUBST([PROGRAM_RPMVERSION], $rpmversion)
+AC_SUBST([PROGRAM_DATE], $releasedate)
+
+# 提早離開 configure 的途徑
+AC_ARG_ENABLE([check],
+	[AS_HELP_STRING([--disable-check],
+		[skip all checks])],
+	[opt_check=$enableval], [opt_check=yes])
+
+if test x"${opt_check}" = xno; then \
+  AC_OUTPUT
+  echo "WARNING: ALL CHECKS ARE SKIPPED!"
+  echo "WARNING: Generated Makefile(s) cannot be used to build the package!"
+  exit 0
+fi
+
 # 和預設的 CFLAGS 說再見
 test -n "${CFLAGS}" && CFLAGS="-g"
-
 
 # 偵錯很重要，但使用者應該不需要
 AC_ARG_ENABLE([debug],
@@ -119,12 +138,6 @@ fi
 
 AM_CONDITIONAL([USING_SETCAP], [test x"${opt_cap}" = xyes])
 
-# 寫入版本資訊
-AC_SUBST([PROGRAM_NAME], [AC_PACKAGE_NAME])
-AC_SUBST([PROGRAM_VERSION], [AC_PACKAGE_VERSION])
-AC_SUBST([PROGRAM_RPMVERSION], $rpmversion)
-AC_SUBST([PROGRAM_DATE], $releasedate)
-
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h locale.h stdlib.h string.h sys/time.h unistd.h])
 
@@ -152,7 +165,6 @@ test x"${opt_ugidname}" = xyes && \
 		 AC_DEFINE([HAVE_CONF_UGIDNAME], [1], 
 		[Conversion between user or group ID and name])
 
-AC_CONFIG_FILES([Makefile sctjudge.spec src/Makefile src/version.h])
 AC_OUTPUT
 
 confmsgsave="config.msg"
