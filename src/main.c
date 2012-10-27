@@ -191,12 +191,16 @@ int main(int argc, char* argv[]){
 						);
 				putchar('\n');
 				printf("編譯時指定的參數列表：\n"
+#ifdef NULL_DEVICE
+						"  * 用於捨棄資料的裝置檔案："
+						NULL_DEVICE
+						" (--with-null)\n"
+#endif
 #ifdef PROC_PATH
 						"  * Linux 的 proc 檔案系統路徑："
 						PROC_PATH
-						" (--with-proc)"
+						" (--with-proc)\n"
 #endif
-						"\n"
 						);
 				exit(SCTEXIT_SUCCESS);
 			}else if(!strcmp(&argv[i][1], "v") || 

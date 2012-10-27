@@ -5,9 +5,6 @@
 #define SCT_CHECKTLE_INTERVAL 128000000
 #define SCT_DISPTIME_INTERVAL 384000000
 
-/* XXX 這個看能不能用 GNU autotool 取代，我可不確定 /dev/null 永遠存在！*/
-#define NULL_DEVICE	"/dev/null"
-
 /* sctjudge 這個程式的 exit status */
 #define SCTEXIT_SUCCESS 0  /* 當然就是正常結束 */
 #define SCTEXIT_SYNTAX  1  /* 解析階段：命令列語法錯誤 */

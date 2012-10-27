@@ -1,13 +1,13 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([sctjudge], [1.0], [lantw44@gmail.com])
+AC_INIT([sctjudge], [1.0-rc1], [lantw44@gmail.com])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([src/config.h])
 
-releasedate="2012-XX-XX"
+releasedate="2012-10-27"
 rpmversion="1.0"
 
 # Checks for programs.
@@ -58,6 +58,16 @@ AC_ARG_ENABLE([cap],
 test x"${opt_cap}" = xyes && \
 		AC_DEFINE([HAVE_CONF_CAP], [1], [Linux Capabilities])
 
+# 可以設定 /dev/null 名稱
+AC_ARG_WITH([null], 
+		AS_HELP_STRING([--with-null=NULL],
+			[set the path of the data sink (default: /dev/null)]),
+		[with_null=$withval], [with_null=/dev/null])
+
+AC_CHECK_FILE([${with_null}],
+		[AC_DEFINE_UNQUOTED([NULL_DEVICE], ["${with_null}"],
+			[Path of the data sink])],
+		[AC_MSG_ERROR([${with_null} does not exist])])
 
 # 可以設定 proc filesystem 在哪裡
 AC_ARG_WITH([proc], 
@@ -67,10 +77,10 @@ AC_ARG_WITH([proc],
 
 if test x"${opt_procmon}" = xyes; then \
 	AC_CHECK_FILES([${with_proc}/stat ${with_proc}/$$/stat ${with_proc}/$$/statm ${with_proc}/$$/status],
-		[AC_DEFINE_UNQUOTED([PROC_PATH], ["${with_proc}"], [Location of Linux proc file system])], 
+		[AC_DEFINE_UNQUOTED([PROC_PATH], ["${with_proc}"], 
+			[Location of Linux proc file system])], 
 		[AC_MSG_ERROR([Linux proc file system support is incomplete])])
 fi
-
 
 # Checks for libraries.
 
