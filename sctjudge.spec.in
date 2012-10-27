@@ -1,12 +1,12 @@
 Name:           @PROGRAM_NAME@
-Version:        @PROGRAM_VERSION@
+Version:        @PROGRAM_RPMVERSION@
 Release:        1%{?dist}
 Summary:        Simple common test judge program
 
 Group:          Applications
-License:        3-clause BSD license
+License:        BSD
 URL:            http://www.tfcis.org/~lantw44/programs.html
-Source0:        sctjudge-%{version}.tar.gz
+Source0:        @PROGRAM_NAME@-@PROGRAM_VERSION@.tar.gz
 
 BuildRequires:  gcc glibc-devel libcap libcap-devel
 Requires:       glibc libcap
@@ -15,7 +15,7 @@ Requires:       glibc libcap
 一個簡易的程式設計題目評測程式
 
 %prep
-%setup -q
+%setup -q -n @PROGRAM_NAME@-@PROGRAM_VERSION@
 
 
 %build

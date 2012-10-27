@@ -189,6 +189,15 @@ int main(int argc, char* argv[]){
 						"自動轉換使用者或群組名稱成 UID 或 GID "
 						"(自動偵測)\n"
 						);
+				putchar('\n');
+				printf("編譯時指定的參數列表：\n"
+#ifdef PROC_PATH
+						"  * Linux 的 proc 檔案系統路徑："
+						PROC_PATH
+						" (--with-proc)"
+#endif
+						"\n"
+						);
 				exit(SCTEXIT_SUCCESS);
 			}else if(!strcmp(&argv[i][1], "v") || 
 					!strcmp(&argv[i][1], "verbose")){

@@ -8,6 +8,7 @@ AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([src/config.h])
 
 releasedate="2012-XX-XX"
+rpmversion="1.0"
 
 # Checks for programs.
 AC_PROG_CC
@@ -58,6 +59,19 @@ test x"${opt_cap}" = xyes && \
 		AC_DEFINE([HAVE_CONF_CAP], [1], [Linux Capabilities])
 
 
+# 可以設定 proc filesystem 在哪裡
+AC_ARG_WITH([proc], 
+		AS_HELP_STRING([--with-proc=PROC],
+			[set the location of your Linux proc file system]),
+		[with_proc=$withval], [with_proc=/proc])
+
+if test x"${opt_procmon}" = xyes; then \
+	AC_CHECK_FILES([${with_proc}/stat ${with_proc}/$$/stat ${with_proc}/$$/statm ${with_proc}/$$/status],
+		[AC_DEFINE_UNQUOTED([PROC_PATH], ["${with_proc}"], [Location of Linux proc file system])], 
+		[AC_MSG_ERROR([Linux proc file system support is incomplete])])
+fi
+
+
 # Checks for libraries.
 
 checkliblist="pthread_create pthread_exit pthread_cancel pthread_join pthread_attr_init pthread_attr_destroy pthread_attr_setdetachstate pthread_mutex_init pthread_mutex_destroy pthread_mutex_lock pthread_mutex_unlock pthread_setcancelstate pthread_setcanceltype"
@@ -98,6 +112,7 @@ AM_CONDITIONAL([USING_SETCAP], [test x"${opt_cap}" = xyes])
 # 寫入版本資訊
 AC_SUBST([PROGRAM_NAME], [AC_PACKAGE_NAME])
 AC_SUBST([PROGRAM_VERSION], [AC_PACKAGE_VERSION])
+AC_SUBST([PROGRAM_RPMVERSION], $rpmversion)
 AC_SUBST([PROGRAM_DATE], $releasedate)
 
 # Checks for header files.
@@ -141,4 +156,8 @@ echo "-------------------------------------------------------------" | tee -a "$
 echo "Compiling and Linking Options:" | tee -a "$confmsgsave"
 echo "(1) Debugging information ........................... $opt_debug" | tee -a "$confmsgsave"
 echo "(2) Statically linked executable .................... $opt_static" | tee -a "$confmsgsave"
+echo "-------------------------------------------------------------" | tee -a "$confmsgsave"
+echo "Strings:" | tee -a "$confmsgsave"
+echo "(1) Linux proc filesystem path ...................... $with_proc" | tee -a "$confmsgsave"
+echo "(2) Data sink path .................................. $with_null" | tee -a "$confmsgsave"
 echo "The above messages has been written to $confmsgsave"
