@@ -33,8 +33,7 @@ setcap 'cap_sys_chroot,cap_setuid,cap_setgid,cap_kill+ep' %{_bindir}/sctjudge
 
 %files
 %defattr(-,root,root,-)
-%doc
 %{_bindir}/sctjudge
-
+%doc COPYING INSTALL README
 
 %changelog
