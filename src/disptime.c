@@ -114,6 +114,8 @@ void* sctjudge_dispaytime(void* arg){
 				}else{
 					fputs("  user%: ?     sys%: ?   ", stdout);
 				}
+			}else{
+				fputs("  user%: ?     sys%: ?   ", stdout);
 			}
 			precpuuser = cpuuser;
 			precpusystem = cpusystem;
