@@ -103,12 +103,17 @@ void* sctjudge_dispaytime(void* arg){
 			}
 			if(!firstrun){
 				diffsyscpuall = syscpuall - presyscpuall;
-				res_cpuuser = 1000 * (cpuuser - precpuuser) / diffsyscpuall;
-				res_cpusystem = 1000 * (cpusystem - precpusystem) / 
-					diffsyscpuall;
-				printf("  user%%: %2hd.%hd  sys%%: %2hd.%hd",
-					res_cpuuser / 10, res_cpuuser % 10,
-					res_cpusystem / 10, res_cpusystem % 10);
+				if(diffsyscpuall){
+					res_cpuuser = 1000 * (cpuuser - precpuuser) / 
+						diffsyscpuall;
+					res_cpusystem = 1000 * (cpusystem - precpusystem) / 
+						diffsyscpuall;
+					printf("  user%%: %2hd.%hd  sys%%: %2hd.%hd",
+						res_cpuuser / 10, res_cpuuser % 10,
+						res_cpusystem / 10, res_cpusystem % 10);
+				}else{
+					fputs("  user%: ?     sys%: ?   ", stdout);
+				}
 			}
 			precpuuser = cpuuser;
 			precpusystem = cpusystem;
