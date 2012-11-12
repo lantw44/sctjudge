@@ -9,8 +9,8 @@
 #include <sys/types.h>
 
 #ifndef HAVE_CONF_CAP
-static uid_t procrealuid = 0;
-static uid_t proceffuid = 0;
+uid_t procrealuid = 0;
+uid_t proceffuid = 0;
 #endif
 
 void checktimespec(struct timespec* arg){

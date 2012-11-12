@@ -539,7 +539,7 @@ void* sctjudge_makechild(void* arg){
 #ifndef HAVE_CONF_CAP
 		enable_setuid();
 #endif
-		fchown(fdoutput, getuid(), -1);
+		fchown(fdoutput, procrealuid, -1);
 
 		/* 再來就是 stderr 了 */
 		if(mcopt.flags & SCTMC_REDIR_STDERR){
@@ -619,7 +619,7 @@ void* sctjudge_makechild(void* arg){
 #ifndef HAVE_CONF_CAP
 		else{
 			/* 確保 setuid 可執行檔所造成的 effective UID 改變不會傳給子程序 */
-			setuid(getuid());
+			setuid(procrealuid);
 		}
 #endif
 

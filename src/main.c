@@ -83,6 +83,13 @@ int main(int argc, char* argv[]){
 	struct group* grinfo;
 #endif
 
+#ifndef HAVE_CONF_CAP
+	/* 即使有 setuid root，還是不能讓每個使用者拿到 root 權限
+	 * 所以說只有在 fork 的時候才要把這個權限開起來，其他就關掉吧 */
+	save_uids();
+	disable_setuid();
+#endif
+
 	/* 預設值當然都是 0 */
 	memset(&mcopt, 0 ,sizeof(mcopt));
 	/* 據說有些 NULL 不是 0，所以還是設定一下比較保險 */
@@ -349,13 +356,6 @@ int main(int argc, char* argv[]){
 		puts(SCTJUDGE_TITLEBAR"\n");
 	}
 
-#ifndef HAVE_CONF_CAP
-	/* 即使有 setuid root，還是不能讓每個使用者拿到 root 權限
-	 * 所以說只有在 fork 的時候才要把這個權限開起來，其他就關掉吧 */
-	save_uids();
-	disable_setuid();
-#endif
-
 	/* 檢查與修正設定值 */
 	if(verbose){
 		puts("正在檢查設定值是否正確......");
@@ -382,14 +382,14 @@ int main(int argc, char* argv[]){
 						stderr);
 				exit(SCTEXIT_BADID);
 			}else{
-				if(getuid() != 0){
+				if(procrealuid != 0){
 					fputs("只有 root 可以將 UID 設定 0\n", stderr);
 					exit(SCTEXIT_BADID);
 				}
 			}
 		}
 	}else{
-		if(getuid() == 0 && !force){
+		if(procrealuid == 0 && !force){
 			fputs("不允許以 root 身份執行本程式（加上 -f 來強制執行）\n", 
 					stderr);
 			exit(SCTEXIT_BADID);
