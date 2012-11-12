@@ -8,10 +8,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#ifndef HAVE_CONF_CAP
 uid_t procrealuid = 0;
 uid_t proceffuid = 0;
-#endif
 
 void checktimespec(struct timespec* arg){
 	long tominus;
