@@ -85,6 +85,6 @@ extern volatile sig_atomic_t break_flag;
 void* sctjudge_checktle(void*);
 
 /* disptime.c */
-void* sctjudge_dispaytime(void*);
+void* sctjudge_displaytime(void*);
 
 #endif

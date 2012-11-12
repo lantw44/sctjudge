@@ -12,7 +12,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-void* sctjudge_dispaytime(void* arg){
+void* sctjudge_displaytime(void* arg){
 	struct timespec timeinit, timecur, timepast;
 	struct timespec timesleep;
 

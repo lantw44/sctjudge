@@ -425,7 +425,7 @@ int main(int argc, char* argv[]){
 				(void*)&exectimelimit);
 	}
 	if(!dryrun && verbose){
-		pthread_create(&tdisplay, &detstate, &sctjudge_dispaytime,
+		pthread_create(&tdisplay, &detstate, &sctjudge_displaytime,
 				(void*)&displayinterval);
 	}
 	pthread_attr_destroy(&detstate);
