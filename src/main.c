@@ -83,10 +83,11 @@ int main(int argc, char* argv[]){
 	struct group* grinfo;
 #endif
 
+	save_uids();
+
 #ifndef HAVE_CONF_CAP
 	/* 即使有 setuid root，還是不能讓每個使用者拿到 root 權限
 	 * 所以說只有在 fork 的時候才要把這個權限開起來，其他就關掉吧 */
-	save_uids();
 	disable_setuid();
 #endif
 

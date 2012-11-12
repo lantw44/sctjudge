@@ -63,12 +63,12 @@ int comparetimespec(t1, t2)
 	return 0;
 }
 
-#ifndef HAVE_CONF_CAP
-
 void save_uids(void){	/* 這個一定要先執行，不然預設 uid 就是 0 */
 	procrealuid = getuid();
 	proceffuid = geteuid();
 }
+
+#ifndef HAVE_CONF_CAP
 
 void disable_setuid(void){
 #ifdef _POSIX_SAVED_IDS
