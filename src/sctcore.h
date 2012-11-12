@@ -33,10 +33,10 @@ struct makechildopt{
 	char* chrootdir;
 	char* inputfile;
 	char* outputfile;
-	int exectime;
-	int memlimit;
-	int outlimit;
-	int flags;
+	unsigned exectime;
+	unsigned memlimit;
+	unsigned outlimit;
+	unsigned flags;
 	uid_t uid;
 	gid_t gid;
 };

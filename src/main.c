@@ -221,8 +221,8 @@ int main(int argc, char* argv[]){
 			}else if(!strcmp(&argv[i][1], "t") ||
 					!strcmp(&argv[i][1], "time")){
 				SCTMAIN_CHECKARGEXIST;
-				mcopt.exectime = atoi(argv[i]);
-				if(mcopt.exectime <= 0){
+				if(sscanf(argv[i], "%u", &mcopt.exectime) <= 0 ||
+						mcopt.exectime <= 0){
 					fprintf(stderr, "%s: 「%s」不是正確的時間設定值\n", 
 							argv[0], argv[i]);
 					exit(SCTEXIT_SYNTAX);
@@ -260,8 +260,9 @@ int main(int argc, char* argv[]){
 					if(!strcmp(qarglist[j].arg_name, "mem") ||
 						!strcmp(qarglist[j].arg_name, "memory")){
 						SCTMAIN_CHECKQARGHAVEVALUE;
-						mcopt.memlimit = atoi(qarglist[j].arg_value);
-						if(mcopt.memlimit <= 0){
+						if(sscanf(qarglist[j].arg_value, "%u", 
+									&mcopt.memlimit) <= 0 || 
+								mcopt.memlimit <= 0){
 							fprintf(stderr, "%s: 「%s」不是正確的記憶體限制"
 									"設定值\n", argv[0], 
 									qarglist[j].arg_value);
@@ -270,8 +271,9 @@ int main(int argc, char* argv[]){
 					}else if(!strcmp(qarglist[j].arg_name, "outlimit") ||
 							!strcmp(qarglist[j].arg_name, "outlim")){
 						SCTMAIN_CHECKQARGHAVEVALUE;
-						mcopt.outlimit = atoi(qarglist[j].arg_value);
-						if(mcopt.outlimit <= 0){
+						if(sscanf(qarglist[j].arg_value, "%u",
+									&mcopt.outlimit) <= 0 ||
+								mcopt.outlimit <= 0){
 							fprintf(stderr, "%s: 「%s」不是正確的輸出限制"
 									"設定\n", argv[0], qarglist[j].arg_value);
 							exit(SCTEXIT_SYNTAX);
