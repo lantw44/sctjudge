@@ -432,13 +432,14 @@ int main(int argc, char* argv[]){
 	pthread_attr_destroy(&joistate);
 	sem_post(&mcthr); 
 
-	/* 這個 semaphore 到這裡就沒用了， 
-	 * sctjudge_makechild 一旦開始動就會把它 destroy 掉 */
 	pthread_join(tmain, (void**)&mtreturn);
 	/* XXX 底下這訊息很有可能讓使用者覺得很奇怪 */
 	pthread_mutex_destroy(&pidmutex);
 	pthread_mutex_destroy(&tkill_mx);
 	pthread_mutex_destroy(&tdisplay_mx);
+
+	sem_destroy(&mcthr);
+	sem_destroy(&addthr);
 
 	if(dryrun){
 		return SCTEXIT_SUCCESS;

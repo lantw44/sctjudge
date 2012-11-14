@@ -31,9 +31,10 @@ void* sctjudge_checktle(void* arg){
 	pthread_mutex_unlock(&tkill_mx);
 
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
 	sem_wait(&addthr);
+	pthread_testcancel();
 	clock_gettime(CLOCK_REALTIME, &timeinit);
 
 #ifndef HAVE_CONF_CAP
@@ -53,6 +54,8 @@ void* sctjudge_checktle(void* arg){
 	timelimit.tv_sec = timeinit.tv_sec + sleeptime / 1000000000;
 	timelimit.tv_nsec = timeinit.tv_nsec + sleeptime % 1000000000;
 
+	pthread_testcancel();
+
 	for(clock_gettime(CLOCK_REALTIME, &timecur);
 			comparetimespec(&timecur, &timelimit) < 0 && !break_flag;
 			clock_gettime(CLOCK_REALTIME, &timecur)){
@@ -62,6 +65,7 @@ void* sctjudge_checktle(void* arg){
 		}else{
 			nanosleep(&timetmp, NULL);
 		}
+		pthread_testcancel();
 	}
 
 	if(!break_flag){

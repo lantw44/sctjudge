@@ -43,9 +43,10 @@ void* sctjudge_displaytime(void* arg){
 	pthread_mutex_unlock(&tdisplay_mx);
 
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
 	sem_wait(&addthr);
+	pthread_testcancel();
 
 #ifndef HAVE_CONF_CAP
 	enable_setuid();
@@ -64,7 +65,10 @@ void* sctjudge_displaytime(void* arg){
 	sprintf(statusfile, PROC_PATH"/%d/status", pidcopy);
 #endif
 
+	pthread_testcancel();
+
 	while(1){
+		pthread_testcancel();
 		clock_gettime(CLOCK_REALTIME, &timecur);
 		difftimespec(&timeinit, &timecur, &timepast);
 		printf("\r%4ld.%03ld 秒", timepast.tv_sec,

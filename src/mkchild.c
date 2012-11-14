@@ -95,6 +95,10 @@ static const char* childmsg_text[SCTCHILD_MSGMAX] = {
 };
 
 static void sctjudge_makechild_cleanup_p1(void){
+	/* 避免有 thread 卡在 sem 上砍不掉 */
+	sem_post(&addthr);
+	sem_post(&addthr);
+
 	pthread_mutex_lock(&tkill_mx);
 	if(tkill_yes){
 		tkill_yes = 0;
@@ -273,7 +277,6 @@ static int read_size(int fd, void* buf, size_t count){
 void* sctjudge_makechild(void* arg){
 	/* 首先等所有 thread 都啟動完成再開始動作 */
 	sem_wait(&mcthr);
-	sem_destroy(&mcthr);
 
 	/* 宣告變數囉！ */
 	int i;
@@ -425,10 +428,9 @@ void* sctjudge_makechild(void* arg){
 		close(childpipe[0]);
 
 		/* 現在我們確定受測程式已經在執行了，所以需要記錄一下時間
-		 * 通知其他 thread，然後就可以把 semaphore 丟掉了 */
+		 * 通知其他 thread */
 		sem_post(&addthr);
 		sem_post(&addthr);
-		sem_destroy(&addthr);
 
 		/* 開始要 wait 了，莫名其妙 stop 的程式我最多只會送
 		 * 5 次 SIGCONT 給你（避免進入無限迴圈） 
