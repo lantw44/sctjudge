@@ -95,10 +95,6 @@ static const char* childmsg_text[SCTCHILD_MSGMAX] = {
 };
 
 static void sctjudge_makechild_cleanup_p1(void){
-	/* 避免有 thread 卡在 sem 上砍不掉 */
-	sem_post(&addthr);
-	sem_post(&addthr);
-
 	pthread_mutex_lock(&tkill_mx);
 	if(tkill_yes){
 		tkill_yes = 0;
@@ -116,6 +112,10 @@ static void sctjudge_makechild_cleanup_p1(void){
 	}else{
 		pthread_mutex_unlock(&tdisplay_mx);
 	}
+
+	/* 這基本上應該是可以去掉的，sem_wait() 也是 cancellation point */
+	sem_post(&addthr);
+	sem_post(&addthr);
 }
 	
 static void sctjudge_makechild_cleanup_p2(mcopt, oldperm, copiedexe)
