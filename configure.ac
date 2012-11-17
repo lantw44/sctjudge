@@ -1,14 +1,14 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([sctjudge], [1.0-rc2], [lantw44@gmail.com])
+AC_INIT([sctjudge], [1.0-rc3], [lantw44@gmail.com])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([Makefile sctjudge.spec src/Makefile src/version.h])
 
-releasedate="2012-11-13"
+releasedate="2012-11-15"
 rpmversion="1.0"
 
 # Checks for programs.
