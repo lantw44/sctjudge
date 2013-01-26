@@ -127,5 +127,6 @@ L4DA* l4da_make_struct(void* data, int itemsize, int len, int maxlen){
 	arr->arr_itemsize = itemsize;
 	arr->arr_curlen = len;
 	arr->arr_maxlen = maxlen;
+	arr->arr_data = data;
 	return arr;
 }

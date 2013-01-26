@@ -31,13 +31,17 @@ L4DA* l4da_filereadline_delim(FILE* infile, int chr){
 	}
 	int c;
 	char towrite;
-	do{
-		c = getc(infile);
+	while((c = getc(infile)) != chr && !feof(infile)){
 		towrite = c;
 		if(l4da_pushback(newarr, (void*)&towrite) < 0){
 			l4da_free(newarr);
 			return NULL;
 		}
-	}while(c != chr);
+	}
+	towrite = '\0';
+	if(l4da_pushback(newarr, (void*)&towrite) < 0){
+		l4da_free(newarr);
+		return NULL;
+	}
 	return newarr;
 }

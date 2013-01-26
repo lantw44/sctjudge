@@ -1,3 +1,4 @@
+
 .PHONY: all clean install uninstall
 all: 
 	$(MAKE) -C l4darr all
@@ -8,5 +9,10 @@ clean:
 	$(MAKE) -C l4bds clean
 	$(MAKE) -C l4arg clean
 install:
-	@echo "You should statically link your program against it instead of installing it!"
-
+	$(MAKE) -C l4darr install
+	$(MAKE) -C l4bds install
+	$(MAKE) -C l4arg install
+uninstall:
+	$(MAKE) -C l4darr uninstall
+	$(MAKE) -C l4bds uninstall
+	$(MAKE) -C l4arg uninstall

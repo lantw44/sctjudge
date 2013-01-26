@@ -23,12 +23,13 @@ int l4da_setlen(L4DA*, int);
 int l4da_setmax(L4DA*, int);
 int l4da_strip(L4DA*);
 #define l4da_itemsize(arr) ((arr)->arr_itemsize)
+#define l4da_data(arr) ((arr)->arr_data)
 #define l4da_v(arr, type, num) \
 	(*(((type*)((arr)->arr_data))+(num)))
 #define l4da_vp(arr, num) \
 	((void*)(((char*)((arr)->arr_data))+(((arr)->arr_itemsize)*(num))))
 
-#define l4da_readline (l4da_filereadline_delim(stdin, '\n'))
+#define l4da_readline() (l4da_filereadline_delim(stdin, '\n'))
 #define l4da_readline_delim(delim) (l4da_filereadline_delim(stdin, (delim)))
 #define l4da_filereadline(infile) (l4da_filereadline_delim((infile), '\n'))
 L4DA* l4da_filereadline_delim(FILE*, int);
@@ -53,6 +54,7 @@ void l4da2_free(L4DA2*);
 #define l4da2_getlenx(arr) ((arr)->arr_lenx)
 #define l4da2_getleny(arr) ((arr)->arr_leny)
 #define l4da2_itemsize(arr) ((arr)->arr_itemsize)
+#define l4da2_data(arr) ((arr)->arr_data)
 #define l4da2_v(arr, type, numx, numy) \
 	(*(((type*)((arr)->arr_data))+((numx)*(l4da2_getleny(arr)))+(numy)))
 #define l4da2_vp(arr, numx, numy) \

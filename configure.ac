@@ -103,24 +103,16 @@ fi
 
 # Checks for libraries.
 
-checkliblist="pthread_create pthread_exit pthread_cancel pthread_join pthread_attr_init pthread_attr_destroy pthread_attr_setdetachstate pthread_mutex_init pthread_mutex_destroy pthread_mutex_lock pthread_mutex_unlock pthread_setcancelstate pthread_setcanceltype"
+AC_CHECK_LIB([pthread], [pthread_create], [LIBS="$LIBS -lpthread -lrt"], 
+		[test_nort=yes], [-lrt])
 
-for i in $checkliblist; do
-  AC_CHECK_LIB([pthread], $i, [true], 
-	[AC_MSG_ERROR(Your POSIX Thread Library may not be properly installed)])
-done
-LIBS="$LIBS -lpthread -lrt"
+if test x"$test_nort" = xyes; then 
+	AC_CHECK_LIB([pthread], [pthread_create], [LIBS="$LIBS -lpthread"],
+		[AC_MSG_ERROR([POSIX Thread Library is required])])
+fi
 
-
-checkliblist="sem_init sem_destroy sem_wait sem_post"
-for i in $checkliblist; do
-  AC_CHECK_LIB([c], $i, [true], [c_sem_notfound=yes])
-  AC_CHECK_LIB([pthread], $i, [true], [pthread_sem_notfound=yes])
-  if test x"${c_sem_notfound}" = xyes && test x"${pthread_sem_notfound}" = xyes
-  then
-    AC_MSG_ERROR(Your semaphore support may be incomplete)
-  fi
-done
+AC_CHECK_LIB([c], [sem_timedwait], [true],
+	[AC_MSG_ERROR([Semaphore support is required])], ["$LIBS"])
 
 
 if test x"${opt_cap}" = xyes; then
