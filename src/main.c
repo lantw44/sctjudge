@@ -418,7 +418,8 @@ int main(int argc, char* argv[]){
 	pthread_mutex_init(&tdisplay_mx, NULL);
 	pthread_mutex_init(&judge_tle_mx, NULL);
 	sem_init(&mcthr, 0, 0);
-	sem_init(&addthr, 0, 0);
+	sem_init(&tlethr, 0, 0);
+	sem_init(&dispthr, 0, 0);
 	pthread_create(&tmain, &joistate, &sctjudge_makechild, (void*)&mcopt);
 	if(!dryrun){
 		pthread_create(&tkill, &detstate, &sctjudge_checktle, 
@@ -439,7 +440,8 @@ int main(int argc, char* argv[]){
 	pthread_mutex_destroy(&tdisplay_mx);
 
 	sem_destroy(&mcthr);
-	sem_destroy(&addthr);
+	sem_destroy(&tlethr);
+	sem_destroy(&dispthr);
 
 	if(dryrun){
 		return SCTEXIT_SUCCESS;

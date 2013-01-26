@@ -21,7 +21,7 @@ extern char tkill_yes, tdisplay_yes;
 extern pthread_mutex_t tkill_mx, tdisplay_mx;
 
 /* 用來讓另外兩個 thread 卡住的 semaphore */
-extern sem_t mcthr, addthr;
+extern sem_t mcthr, tlethr, dispthr;
 
 /* 判斷有無 TLE，此變數由 sctjudge_checktle 設定 */
 extern char judge_tle;

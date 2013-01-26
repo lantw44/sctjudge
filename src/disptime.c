@@ -15,6 +15,7 @@
 void* sctjudge_displaytime(void* arg){
 	struct timespec timeinit, timecur, timepast;
 	struct timespec timesleep;
+	struct timespec timeexpire;
 
 	timesleep.tv_sec = 0;
 	timesleep.tv_nsec = (*(long*)arg);
@@ -42,11 +43,7 @@ void* sctjudge_displaytime(void* arg){
 	tdisplay_yes = 1;
 	pthread_mutex_unlock(&tdisplay_mx);
 
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-
-	sem_wait(&addthr);
-	pthread_testcancel();
+	sem_wait(&dispthr);
 
 #ifndef HAVE_CONF_CAP
 	enable_setuid();
@@ -65,10 +62,7 @@ void* sctjudge_displaytime(void* arg){
 	sprintf(statusfile, PROC_PATH"/%d/status", pidcopy);
 #endif
 
-	pthread_testcancel();
-
-	while(1){
-		pthread_testcancel();
+	do{
 		clock_gettime(CLOCK_REALTIME, &timecur);
 		difftimespec(&timeinit, &timecur, &timepast);
 		printf("\r%4ld.%03ld 秒", timepast.tv_sec,
@@ -139,8 +133,12 @@ void* sctjudge_displaytime(void* arg){
 		firstrun = 0;
 #endif
 		fflush(stdout);
-		nanosleep(&timesleep, NULL);
-	}
+
+		clock_gettime(CLOCK_REALTIME, &timecur);
+		timeexpire.tv_sec = timecur.tv_sec + timesleep.tv_sec;
+		timeexpire.tv_nsec = timecur.tv_nsec + timesleep.tv_nsec;
+		checktimespec(&timeexpire);
+	}while(sem_timedwait(&dispthr, &timeexpire));
 
 	pthread_mutex_lock(&tdisplay_mx);
 	tdisplay_yes = 0;

@@ -17,24 +17,21 @@ volatile sig_atomic_t break_flag;
 
 static void break_handler(int signo){
 	break_flag = 1;
+	sem_post(&tlethr);
 }
 
 void* sctjudge_checktle(void* arg){
 	pid_t pidcopy;
 	long long sleeptime = (long long)(*(int*)arg) * 1000000;
 	struct sigaction break_catch;
-	struct timespec timelimit, timeinit, timecur, timetmp;
+	struct timespec timelimit, timeinit, timecur, timeexpire;
 	const struct timespec nanslparg = {0, SCT_CHECKTLE_INTERVAL};
 
 	pthread_mutex_lock(&tkill_mx);
 	tkill_yes = 1;
 	pthread_mutex_unlock(&tkill_mx);
 
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-
-	sem_wait(&addthr);
-	pthread_testcancel();
+	sem_wait(&tlethr);
 	clock_gettime(CLOCK_REALTIME, &timeinit);
 
 #ifndef HAVE_CONF_CAP
@@ -54,19 +51,13 @@ void* sctjudge_checktle(void* arg){
 	timelimit.tv_sec = timeinit.tv_sec + sleeptime / 1000000000;
 	timelimit.tv_nsec = timeinit.tv_nsec + sleeptime % 1000000000;
 
-	pthread_testcancel();
-
-	for(clock_gettime(CLOCK_REALTIME, &timecur);
-			comparetimespec(&timecur, &timelimit) < 0 && !break_flag;
-			clock_gettime(CLOCK_REALTIME, &timecur)){
-		difftimespec(&timecur, &timelimit, &timetmp);
-		if(comparetimespec(&timetmp, &nanslparg) > 0){
-			nanosleep(&nanslparg, NULL);
-		}else{
-			nanosleep(&timetmp, NULL);
-		}
-		pthread_testcancel();
-	}
+	do{
+		clock_gettime(CLOCK_REALTIME, &timecur);
+		timeexpire.tv_sec = timecur.tv_sec;
+		timeexpire.tv_nsec = timecur.tv_nsec + SCT_CHECKTLE_INTERVAL;
+		checktimespec(&timeexpire);
+	}while(comparetimespec(&timecur, &timelimit) < 0 && 
+		sem_timedwait(&tlethr, &timeexpire));
 
 	if(!break_flag){
 		pthread_mutex_lock(&judge_tle_mx);

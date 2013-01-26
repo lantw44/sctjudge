@@ -72,7 +72,7 @@ pid_t pidchild;
 pthread_mutex_t pidmutex, tkill_mx, tdisplay_mx, judge_tle_mx;
 pthread_t tkill, tdisplay;
 char tkill_yes = 0, tdisplay_yes = 0, judge_tle = 0;
-sem_t mcthr, addthr;
+sem_t mcthr, tlethr, dispthr;
 
 static const char* childmsg_text[SCTCHILD_MSGMAX] = {
 	"開啟輸入檔案",
@@ -99,7 +99,7 @@ static void sctjudge_makechild_cleanup_p1(void){
 	if(tkill_yes){
 		tkill_yes = 0;
 		pthread_mutex_unlock(&tkill_mx);
-		pthread_cancel(tkill);
+		sem_post(&tlethr);
 	}else{
 		pthread_mutex_unlock(&tkill_mx);
 	}
@@ -108,14 +108,11 @@ static void sctjudge_makechild_cleanup_p1(void){
 	if(tdisplay_yes){
 		tdisplay_yes = 0;
 		pthread_mutex_unlock(&tdisplay_mx);
-		pthread_cancel(tdisplay);
+		sem_post(&dispthr);
 	}else{
 		pthread_mutex_unlock(&tdisplay_mx);
 	}
 
-	/* 這基本上應該是可以去掉的，sem_wait() 也是 cancellation point */
-	sem_post(&addthr);
-	sem_post(&addthr);
 }
 	
 static void sctjudge_makechild_cleanup_p2(mcopt, oldperm, copiedexe)
@@ -429,8 +426,8 @@ void* sctjudge_makechild(void* arg){
 
 		/* 現在我們確定受測程式已經在執行了，所以需要記錄一下時間
 		 * 通知其他 thread */
-		sem_post(&addthr);
-		sem_post(&addthr);
+		sem_post(&tlethr);
+		sem_post(&dispthr);
 
 		/* 開始要 wait 了，莫名其妙 stop 的程式我最多只會送
 		 * 5 次 SIGCONT 給你（避免進入無限迴圈） 
