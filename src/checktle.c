@@ -50,6 +50,7 @@ void* sctjudge_checktle(void* arg){
 
 	timelimit.tv_sec = timeinit.tv_sec + sleeptime / 1000000000;
 	timelimit.tv_nsec = timeinit.tv_nsec + sleeptime % 1000000000;
+	checktimespec(&timelimit);
 
 	do{
 		clock_gettime(CLOCK_REALTIME, &timecur);
