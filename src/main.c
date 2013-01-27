@@ -121,10 +121,10 @@ int main(int argc, char* argv[]){
 					"      指定受測程式可執行檔名稱（務必靜態連結！）\n\n"
 					"  -i/-input <檔案>\n"
 					"      指定要導向至受測程式標準輸入的檔案，若未指定則為 "
-					NULL_DEVICE"\n\n"
+					WITH_NULL"\n\n"
 					"  -o/-output <檔案>\n"
 					"      指定要導向至受測程式標準輸出的檔案，若未指定則為 "
-					NULL_DEVICE"\n\n"
+					WITH_NULL"\n\n"
 					"  -r/-root <目錄>\n"
 					"      受測程式將以<目錄>為根目錄執行，若無此選項則關"
 					"閉 chroot 功能\n\n"
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]){
 					"          將受測程式的標準錯誤也導向至輸出檔。若未指定，"
 					"則只有標準輸\n"
 					"          出會寫入輸出檔案，標準錯誤則被導向至 "
-					NULL_DEVICE"\n\n"
+					WITH_NULL"\n\n"
 					"      nocopy\n"
 					"          如果啟用了 chroot 功能，預設情況下本程式會自動"
 					"將檔案複製\n"
@@ -162,54 +162,7 @@ int main(int argc, char* argv[]){
 			}else if(!strcmp(&argv[i][1], "V") ||
 					!strcmp(&argv[i][1], "version") ||
 					!strcmp(&argv[i][1], "-version")){
-				puts(SCTJUDGE_TITLEBAR);
-				putchar('\n');
-				printf("目前可用(+)和不可用(-)的功能列表：\n"
-#ifdef HAVE_CONF_PROCMON
-						"  + "
-#else
-						"  - "
-#endif
-						"使用 Linux 的 proc 檔案系統來增強程序監視器的功能 (--"
-#ifdef HAVE_CONF_PROCMON
-						"enable"
-#else
-						"disable"
-#endif
-						"-procmon)\n"
-#ifdef HAVE_CONF_CAP
-						"  + "
-#else
-						"  - "
-#endif
-						"支援 Linux capabilities (--"
-#ifdef HAVE_CONF_CAP
-						"enable"
-#else
-						"disable"
-#endif
-						"-cap)\n"
-#ifdef HAVE_CONF_UGIDNAME
-						"  + "
-#else
-						"  - "
-#endif
-						"自動轉換使用者或群組名稱成 UID 或 GID "
-						"(自動偵測)\n"
-						);
-				putchar('\n');
-				printf("編譯時指定的參數列表：\n"
-#ifdef NULL_DEVICE
-						"  * 用於捨棄資料的裝置檔案："
-						NULL_DEVICE
-						" (--with-null)\n"
-#endif
-#ifdef PROC_PATH
-						"  * Linux 的 proc 檔案系統路徑："
-						PROC_PATH
-						" (--with-proc)\n"
-#endif
-						);
+				fputs(SCTJUDGE_ABOUT_STRING, stdout);
 				exit(SCTEXIT_SUCCESS);
 			}else if(!strcmp(&argv[i][1], "v") || 
 					!strcmp(&argv[i][1], "verbose")){
@@ -366,7 +319,7 @@ int main(int argc, char* argv[]){
 		exit(SCTEXIT_TOOFEW);
 	}
 	if(mcopt.inputfile == NULL){
-		mcopt.inputfile = NULL_DEVICE;
+		mcopt.inputfile = WITH_NULL;
 	}
 	if(mcopt.outputfile == NULL){
 		fputs("輸出檔案名稱必要參數，不可為空白\n", stderr);

@@ -20,12 +20,12 @@ void* sctjudge_displaytime(void* arg){
 	timesleep.tv_sec = 0;
 	timesleep.tv_nsec = (*(long*)arg);
 
-#ifdef HAVE_CONF_PROCMON
+#ifdef HAVE_CONF_PROCMON_LINUX
 	int i;
 
 	pid_t pidcopy;
 
-	const char* sysstatfile = PROC_PATH"/stat";
+	const char* sysstatfile = WITH_LINUXPROC"/stat";
 	char statfile[25], statusfile[25];
 	FILE *statp, *statusp, *sysstatp;
 
@@ -51,15 +51,15 @@ void* sctjudge_displaytime(void* arg){
 
 	clock_gettime(CLOCK_REALTIME, &timeinit);
 
-#ifdef HAVE_CONF_PROCMON
+#ifdef HAVE_CONF_PROCMON_LINUX
 	pthread_mutex_lock(&pidmutex);
 	pidcopy = pidchild;
 	pthread_mutex_unlock(&pidmutex);
 #endif
 
-#ifdef HAVE_CONF_PROCMON
-	sprintf(statfile, PROC_PATH"/%d/stat", pidcopy);
-	sprintf(statusfile, PROC_PATH"/%d/status", pidcopy);
+#ifdef HAVE_CONF_PROCMON_LINUX
+	sprintf(statfile, WITH_LINUXPROC"/%d/stat", pidcopy);
+	sprintf(statusfile, WITH_LINUXPROC"/%d/status", pidcopy);
 #endif
 
 	do{
@@ -67,7 +67,7 @@ void* sctjudge_displaytime(void* arg){
 		difftimespec(&timeinit, &timecur, &timepast);
 		printf("\r%4ld.%03ld 秒", timepast.tv_sec,
 				timepast.tv_nsec / 1000000);
-#ifdef HAVE_CONF_PROCMON
+#ifdef HAVE_CONF_PROCMON_LINUX
 		statp = fopen(statfile, "r");
 		statusp = fopen(statusfile, "r");
 		sysstatp = fopen(sysstatfile, "r");
@@ -106,7 +106,7 @@ void* sctjudge_displaytime(void* arg){
 						diffsyscpuall;
 					res_cpusystem = 1000 * (cpusystem - precpusystem) / 
 						diffsyscpuall;
-					printf("  user%%: %2hd.%hd  sys%%: %2hd.%hd",
+					printf("  user%%: %2d.%d  sys%%: %2d.%d",
 						res_cpuuser / 10, res_cpuuser % 10,
 						res_cpusystem / 10, res_cpusystem % 10);
 				}else{

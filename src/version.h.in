@@ -2,3 +2,78 @@
 #define SCTJUDGE_VERSION "@PROGRAM_VERSION@"
 #define SCTJUDGE_DATE "@PROGRAM_DATE@"
 #define SCTJUDGE_TITLEBAR SCTJUDGE_NAME" "SCTJUDGE_VERSION" ("SCTJUDGE_DATE")" 
+
+#if (defined(HAVE_CONF_PROCMON_LINUX) || defined(HAVE_CONF_PROCMON_FREEBSD))
+# define HAVE_CONF_PROCMON_SYMBOL "  + "
+# define HAVE_CONF_PROCMON_STRING "enable"
+# if defined(HAVE_CONF_PROCMON_LINUX)
+#  define HAVE_CONF_PROCMON_METHOD "linux"
+# elif defined(HAVE_CONF_PROCMON_FREEBSD)
+#  define HAVE_CONF_PROCMON_METHOD "freebsd"
+# else
+#  define HAVE_CONF_PROCMON_METHOD "unknown"
+# endif
+#else
+# define HAVE_CONF_PROCMON_SYMBOL "  - "
+# define HAVE_CONF_PROCMON_STRING "disable"
+#endif
+
+#ifdef HAVE_CONF_CAP
+# define HAVE_CONF_CAP_SYMBOL "  + "
+# define HAVE_CONF_CAP_STRING "enable"
+#else
+# define HAVE_CONF_CAP_SYMBOL "  - "
+# define HAVE_CONF_CAP_STRING "disable"
+#endif
+
+#ifdef HAVE_CONF_UGIDNAME
+# define HAVE_CONF_UGIDNAME_SYMBOL "  + "
+# define HAVE_CONF_UGIDNAME_STRING "enable"
+#else
+# define HAVE_CONF_UGIDNAME_SYMBOL "  - "
+# define HAVE_CONF_UGIDNAME_STRING "disable"
+#endif
+
+#ifdef WITH_NULL
+# define WITH_NULL_STRING \
+	"  * 用於捨棄資料的裝置檔案：" \
+	WITH_NULL \
+	" (--with-null)\n" 
+#else
+# define WITH_NULL_STRING ""
+#endif
+
+#ifdef WITH_LINUXPROC
+# define WITH_LINUXPROC_STRING \
+	"  * Linux 的 proc 檔案系統路徑：" \
+	WITH_LINUXPROC \
+	" (--with-linuxproc)\n"
+#else
+# define WITH_LINUXPROC_STRING ""
+#endif
+
+#define SCTJUDGE_ABOUT_STRING \
+	SCTJUDGE_TITLEBAR"\n" \
+	"\n" \
+	SCTJUDGE_NAME" 是自由軟體，您可以依據 New BSD License 的規範" \
+	"自由修改與散布這個程式。\n" \
+	"本程式沒有任何擔保，作者也不會對任何正確或" \
+	"錯誤使用本程式造成的損失負責。\n" \
+	"\n" \
+	"目前可用(+)和不可用(-)的功能列表：\n" \
+	HAVE_CONF_PROCMON_SYMBOL \
+	"增強的程序監視器的功能 (--" \
+	HAVE_CONF_PROCMON_STRING \
+	"-procmon=" \
+	HAVE_CONF_PROCMON_METHOD \
+	")\n" \
+	HAVE_CONF_CAP_SYMBOL \
+	"支援 Linux capabilities (--" \
+	HAVE_CONF_CAP_STRING \
+	"-cap)\n" \
+	HAVE_CONF_UGIDNAME_SYMBOL \
+	"自動轉換使用者或群組名稱成 UID 或 GID (自動偵測)\n" \
+	"\n" \
+	"編譯時指定的參數列表：\n" \
+	WITH_NULL_STRING \
+	WITH_LINUXPROC_STRING 

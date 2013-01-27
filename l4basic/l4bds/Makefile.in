@@ -1,11 +1,11 @@
-CC=cc
+CC=@AUTOTOOL_CC@
 AR=ar
 RM=rm -f
 INSTALL=install -m 644
-LOCAL_CFLAGS=-g
+LOCAL_CFLAGS=@AUTOTOOL_CFLAGS@
 CFLAGS=-Wall -I. $(LOCAL_CFLAGS)
-OBJ=d1array.o d1arrstr.o d2array.o
-LIBFILE=libl4darr.a
+OBJ=list.o
+LIBFILE=libl4bds.a
 DESTDIR=/
 PREFIX=/usr/local
 LIBDIR=$(DESTDIR)/$(PREFIX)/lib

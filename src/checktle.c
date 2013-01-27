@@ -25,7 +25,6 @@ void* sctjudge_checktle(void* arg){
 	long long sleeptime = (long long)(*(int*)arg) * 1000000;
 	struct sigaction break_catch;
 	struct timespec timelimit, timeinit, timecur, timeexpire;
-	const struct timespec nanslparg = {0, SCT_CHECKTLE_INTERVAL};
 
 	pthread_mutex_lock(&tkill_mx);
 	tkill_yes = 1;

@@ -549,7 +549,7 @@ void* sctjudge_makechild(void* arg){
 				SCTCHILD_WRITE_SUCCMSG(SCTCHILD_DUP2_STDERR);
 			}
 		}else{
-			fderr = open(NULL_DEVICE, O_RDONLY);
+			fderr = open(WITH_NULL, O_RDONLY);
 			if(fderr < 0){
 				SCTCHILD_WRITE_FAILMSG(SCTCHILD_OPEN_STDERR);
 				exit(1);

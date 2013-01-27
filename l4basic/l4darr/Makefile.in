@@ -1,11 +1,11 @@
-CC=cc
+CC=@AUTOTOOL_CC@
 AR=ar
 RM=rm -f
 INSTALL=install -m 644
-LOCAL_CFLAGS=-g
-CFLAGS=-Wall -I. -I../l4darr $(LOCAL_CFLAGS)
-OBJ=toargv.o qarg.o
-LIBFILE=libl4arg.a
+LOCAL_CFLAGS=@AUTOTOOL_CFLAGS@
+CFLAGS=-Wall -I. $(LOCAL_CFLAGS)
+OBJ=d1array.o d1arrstr.o d2array.o
+LIBFILE=libl4darr.a
 DESTDIR=/
 PREFIX=/usr/local
 LIBDIR=$(DESTDIR)/$(PREFIX)/lib
@@ -19,6 +19,6 @@ clean:
 	$(RM) $(LIBFILE) $(OBJ)
 install:
 	mkdir -p $(LIBDIR)
-	$(INSTALL) $(LIBFILE) $(LIBDIR)
+	$(INSTALL) -c $(LIBFILE) $(LIBDIR)
 uninstall:
 	$(RM) $(LIBDIR)/$(LIBFILE)
