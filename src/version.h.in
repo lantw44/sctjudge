@@ -7,15 +7,16 @@
 # define HAVE_CONF_PROCMON_SYMBOL "  + "
 # define HAVE_CONF_PROCMON_STRING "enable"
 # if defined(HAVE_CONF_PROCMON_LINUX)
-#  define HAVE_CONF_PROCMON_METHOD "linux"
+#  define HAVE_CONF_PROCMON_METHOD "=linux"
 # elif defined(HAVE_CONF_PROCMON_FREEBSD)
-#  define HAVE_CONF_PROCMON_METHOD "freebsd"
+#  define HAVE_CONF_PROCMON_METHOD "=freebsd"
 # else
-#  define HAVE_CONF_PROCMON_METHOD "unknown"
+#  define HAVE_CONF_PROCMON_METHOD "=unknown"
 # endif
 #else
 # define HAVE_CONF_PROCMON_SYMBOL "  - "
 # define HAVE_CONF_PROCMON_STRING "disable"
+# define HAVE_CONF_PROCMON_METHOD ""
 #endif
 
 #ifdef HAVE_CONF_CAP
@@ -64,7 +65,7 @@
 	HAVE_CONF_PROCMON_SYMBOL \
 	"增強的程序監視器的功能 (--" \
 	HAVE_CONF_PROCMON_STRING \
-	"-procmon=" \
+	"-procmon" \
 	HAVE_CONF_PROCMON_METHOD \
 	")\n" \
 	HAVE_CONF_CAP_SYMBOL \
