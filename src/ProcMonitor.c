@@ -1,10 +1,10 @@
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# include "SctConfig.h"
 #endif
 
-#include "config2.h"
-#include "common.h"
-#include "sctcore.h"
+#include "SctConst.h"
+#include "SctCommon.h"
+#include "ProcCommon.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -12,6 +12,12 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+
+void* sctproc_monitor(void* arg){
+	return NULL;
+}
+
+#if 0
 void* sctjudge_displaytime(void* arg){
 	struct timespec timeinit, timecur, timepast;
 	struct timespec timesleep;
@@ -147,3 +153,4 @@ void* sctjudge_displaytime(void* arg){
 	return NULL;
 }
 
+#endif

@@ -18,9 +18,4 @@
 
 =============================================================================
 
-以下列出 configure 而可用的選項（也可用 ./configure --help 查到）
-  --enable-debug       停用 -O2 選項並加上 -g (但如果你有指定 CFLAGS 就沒效了)
-  --enable-static      靜態連結可執行檔
-  --enable-procmon     使用 Linux 下 /proc 提供的資訊監控程序
-  --enable-cap         使用 Linux capability 支援（而不使用 setuid）
-
+可用的選項，請參考 ./configure --help 的輸出！

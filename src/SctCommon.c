@@ -1,15 +1,91 @@
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# include "SctConfig.h"
 #endif
 
-#include "common.h"
+#include "SctCommon.h"
 
 #include <time.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 
+#include <pthread.h>
+
 uid_t procrealuid = 0;
 uid_t proceffuid = 0;
+
+int str_to_u(const char* s, unsigned* u){
+	char* p;
+	unsigned o;
+	errno = 0;
+	o = strtoul(s, &p, 0);
+	if(errno || *p){
+		return -1;
+	}
+	*u = o;
+	return 0;
+}
+
+int read_complete(int fd, void* buf, size_t count){
+	/* 一定要讀到 count 位元組的資料才會回傳，所以只要回傳 < count
+	 * 就表示已經讀到 EOF 了 */
+	char* bufp = (char*)buf;
+	size_t curcount = 0;
+	int rval;
+	do{
+		rval = read(fd, bufp, count - curcount);
+		if(rval < 0){
+			return rval;
+		}else if(rval == 0){
+			return curcount;
+		}else{
+			bufp += rval;
+			curcount += rval;
+		}
+	}while(curcount < count);
+	return count;
+}
+
+int strerror_threadsafe(int errnum, char* buf, size_t buflen){
+	static pthread_mutex_t strerror_call_mutex = PTHREAD_MUTEX_INITIALIZER;
+	char* rval;
+	int rlen;
+	pthread_mutex_lock(&strerror_call_mutex);
+	rval = strerror(errnum);
+	rlen = strlen(rval);
+	if(buflen < rlen){
+		pthread_mutex_unlock(&strerror_call_mutex	);
+		return -1;
+	}
+	strcpy(buf, rval);
+	pthread_mutex_unlock(&strerror_call_mutex);
+	return 0;
+}
+
+int sprintf_malloc(char** strstore, const char* format, ...){
+	int len;
+	char* newstr;
+	va_list ap;
+
+	va_start(ap, format);
+	len = vsnprintf(NULL, 0, format, ap) + 1;
+	va_end(ap);
+
+	newstr = malloc(len);
+	if(newstr == NULL){
+		return -1;
+	}
+
+	va_start(ap, format);
+	len = vsnprintf(newstr, len, format, ap);
+	va_end(ap);
+
+	*strstore = newstr;
+	return len;
+}
 
 void checktimespec(struct timespec* arg){
 	long tominus;

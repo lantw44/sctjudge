@@ -4,8 +4,8 @@
 AC_INIT([sctjudge], [1.0], [lantw44@gmail.com])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AM_SILENT_RULES([yes])
-AC_CONFIG_SRCDIR([src/main.c])
-AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_SRCDIR([src/SctMain.c])
+AC_CONFIG_HEADERS([src/SctConfig.h])
 AC_CONFIG_FILES([
 	Makefile 
 	sctjudge.spec 
@@ -13,7 +13,7 @@ AC_CONFIG_FILES([
 	l4basic/l4bds/Makefile
 	l4basic/l4darr/Makefile
 	src/Makefile 
-	src/version.h
+	src/SctVersion.h
 	])
 
 releasedate="2013-01-27"
@@ -222,6 +222,14 @@ if test x"${opt_procmon}" = xyes; then
 			;;
 	esac
 fi
+
+case "${opt_procmon}" in
+	linux|freebsd|yes|no|guess)
+		;;
+	*)
+		AC_MSG_ERROR([--enable-procmon="${opt_procmon}" is invalid])
+		;;
+esac
 	
 
 if test x"${opt_procmon}" = xlinux || test x"${opt_procmon}" = xguess; then 

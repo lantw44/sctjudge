@@ -3,8 +3,11 @@ sctjudge_CFLAGS = -Wall -pipe -pthread -I../l4basic/l4darr -I../l4basic/l4arg\
 				  -D_REENTRANT -D_THREAD_SAFE
 sctjudge_LDFLAGS = -L../l4basic/l4darr -L../l4basic/l4arg
 sctjudge_LDADD = -ll4arg -ll4darr
-sctjudge_SOURCES = common.c common.h config.h sctcore.h disptime.c checktle.c\
-				   main.c mkchild.c version.h config2.h
+sctjudge_SOURCES = SctMain.c SctCommon.c SctCommon.h SctVersion.h \
+				   ProcMain.c ProcCommon.h ProcCheckTime.c ProcMonitor.c \
+				   JudgeMain.c JudgeCommon.h \
+				   CliMain.c CliCommon.h \
+				   SctConfig.h SctConst.h
 
 if STATIC_EXEC
   sctjudge_LDFLAGS += -static

@@ -8,6 +8,7 @@
 *.so
 *.gz
 *.swp
+tags
 aclocal.m4
 autom4te.cache
 autoscan.log
@@ -22,14 +23,16 @@ configure.scan
 depcomp
 missing
 install-sh
+/.cproject
+/.project
 /Makefile
 /Makefile.in
 /sctjudge.spec
 /src/Makefile
 /src/Makefile.in
-/src/config.h
-/src/config.h.in
-/src/version.h
+/src/SctConfig.h
+/src/SctConfig.h.in
+/src/SctVersion.h
 /src/stamp-h1
 /src/sctjudge
 /l4basic/l4arg/Makefile
